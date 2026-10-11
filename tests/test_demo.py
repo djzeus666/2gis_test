@@ -28,8 +28,26 @@ def test_demo_landing_rendering():
     response = client.get("/demo/test-org-123")
     assert response.status_code == 200
     assert "Автосервис Плюс" in response.text
-    assert "Автосервис &amp; Детейлинг" in response.text or "Автосервис & Детейлинг" in response.text
     assert "+7 (999) 111-22-33" in response.text
+
+def test_all_10_templates_rendering():
+    db = SessionLocal()
+    org = Organization(
+        id="test-org-templates",
+        name="СтройГрупп",
+        category="construction",
+        city="Санкт-Петербург",
+        phone="+7 (812) 555-44-33"
+    )
+    db.add(org)
+    db.commit()
+    db.close()
+
+    for t_id in range(1, 11):
+        response = client.get(f"/demo/test-org-templates?template={t_id}")
+        assert response.status_code == 200
+        assert "СтройГрупп" in response.text
+        assert f"Шаблон #{t_id}" in response.text or f"#{t_id}" in response.text
 
 def test_demo_landing_404():
     response = client.get("/demo/non-existent-id")

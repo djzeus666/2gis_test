@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ org.name }} — {% block title %}{{ config.badge }}{% endblock %}</title>
+    <title>{{ org.name }} — {{ config.badge }} (Шаблон #{{ template_cfg.id }}: {{ template_cfg.name }})</title>
     <!-- Tailwind CSS via CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
@@ -11,54 +11,86 @@
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <style>
-        body { font-family: 'Inter', sans-serif; }
-    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 </head>
-<body class="bg-slate-950 text-slate-100 antialiased selection:bg-amber-500 selection:text-slate-950">
+<body class="{{ template_cfg.bg_class }} {{ template_cfg.font_family }} antialiased selection:bg-amber-500 selection:text-slate-950 pb-28">
 
-    <!-- Top Demo Announcement Bar for Prospective Client -->
-    <div class="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white text-xs md:text-sm py-2 px-4 text-center font-medium shadow-md sticky top-0 z-50">
+    <!-- Top Floating Template Switcher Bar -->
+    <div class="fixed bottom-0 left-0 right-0 z-50 bg-slate-950/95 border-t border-slate-800 backdrop-blur-xl px-4 py-3 shadow-2xl text-slate-100">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-3">
+            <div class="flex items-center gap-2 text-xs md:text-sm font-semibold">
+                <span class="w-3 h-3 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span class="text-slate-400">Переключение дизайна (10 вариантов):</span>
+                <span class="text-white bg-slate-800 px-2.5 py-1 rounded-lg border border-slate-700">
+                    #{{ template_cfg.id }} — {{ template_cfg.name }}
+                </span>
+            </div>
+
+            <!-- Scrollable Template Buttons -->
+            <div class="flex items-center gap-1.5 overflow-x-auto max-w-full pb-1 md:pb-0 scrollbar-none">
+                {% for t_id, t_item in all_templates.items() %}
+                <a href="/demo/{{ org.id }}?template={{ t_id }}"
+                   class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all whitespace-nowrap flex items-center gap-1.5
+                   {% if t_id == template_cfg.id %}
+                       bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 shadow-md shadow-amber-500/20 scale-105 ring-2 ring-amber-400
+                   {% else %}
+                       bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800
+                   {% endif %}">
+                    <span>#{{ t_id }}</span>
+                    <span class="hidden lg:inline font-normal opacity-80">{{ t_item.name }}</span>
+                </a>
+                {% endfor %}
+            </div>
+
+            <div class="hidden xl:flex items-center gap-2">
+                <a href="#offer-modal" onclick="openOfferModal()" class="{{ template_cfg.primary_btn_class }} px-4 py-1.5 rounded-xl text-xs uppercase tracking-wider font-extrabold">
+                    Заказать данный шаблон
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Announcement Bar -->
+    <div class="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white text-xs md:text-sm py-2 px-4 text-center font-medium shadow-md sticky top-0 z-40">
         <div class="max-w-7xl mx-auto flex flex-wrap justify-between items-center gap-2">
             <div class="flex items-center gap-2 mx-auto md:mx-0">
-                <span class="bg-white/20 px-2 py-0.5 rounded text-xs uppercase font-bold tracking-wider">Демо-сайт</span>
-                <span>Это интерактивный пример современного сайта для компании <strong>{{ org.name }}</strong></span>
+                <span class="bg-white/20 px-2 py-0.5 rounded text-xs uppercase font-bold tracking-wider">Интерактивный Демо-Портфолио</span>
+                <span>Вы смотрите Шаблон №{{ template_cfg.id }} ({{ template_cfg.name }}) для <strong>{{ org.name }}</strong></span>
             </div>
-            <a href="#contact-modal" onclick="openOfferModal()" class="mx-auto md:mx-0 bg-white text-slate-900 px-3 py-1 rounded-full text-xs font-bold hover:bg-amber-300 transition-colors">
+            <a href="#offer-modal" onclick="openOfferModal()" class="mx-auto md:mx-0 bg-white text-slate-900 px-3 py-1 rounded-full text-xs font-bold hover:bg-amber-300 transition-colors shadow">
                 Хочу такой сайт себе &rarr;
             </a>
         </div>
     </div>
 
     <!-- Navigation Header -->
-    <header class="border-b border-slate-800/80 bg-slate-950/80 backdrop-blur-md sticky top-[33px] z-40">
+    <header class="{{ template_cfg.header_class }} sticky top-[33px] z-30 transition-all">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
             <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-500 to-orange-600 flex items-center justify-center font-black text-xl text-slate-950 shadow-lg shadow-amber-500/20">
+                <div class="w-10 h-10 {{ template_cfg.border_radius }} bg-gradient-to-tr from-amber-500 to-orange-600 flex items-center justify-center font-black text-xl text-slate-950 shadow-lg shadow-amber-500/20">
                     {{ org.name[0] | upper }}
                 </div>
                 <div>
-                    <span class="text-xl font-bold tracking-tight text-white block leading-tight">{{ org.name }}</span>
-                    <span class="text-xs text-slate-400 block">{{ config.badge }} {% if org.city %}• {{ org.city }}{% endif %}</span>
+                    <span class="text-xl font-bold tracking-tight block leading-tight">{{ org.name }}</span>
+                    <span class="text-xs opacity-70 block">{{ config.badge }} {% if org.city %}• {{ org.city }}{% endif %}</span>
                 </div>
             </div>
 
-            <nav class="hidden md:flex items-center gap-8 text-sm font-medium text-slate-300">
-                <a href="#about" class="hover:text-amber-400 transition-colors">О компании</a>
-                <a href="#features" class="hover:text-amber-400 transition-colors">Преимущества</a>
-                <a href="#services" class="hover:text-amber-400 transition-colors">Услуги & Цены</a>
-                <a href="#contacts" class="hover:text-amber-400 transition-colors">Контакты</a>
+            <nav class="hidden md:flex items-center gap-8 text-sm font-medium opacity-90">
+                <a href="#about" class="hover:{{ template_cfg.accent_text_class }} transition-colors">О компании</a>
+                <a href="#features" class="hover:{{ template_cfg.accent_text_class }} transition-colors">Преимущества</a>
+                <a href="#services" class="hover:{{ template_cfg.accent_text_class }} transition-colors">Услуги & Цены</a>
+                <a href="#contacts" class="hover:{{ template_cfg.accent_text_class }} transition-colors">Контакты</a>
             </nav>
 
             <div class="flex items-center gap-4">
                 {% if org.phone %}
-                <a href="tel:{{ org.phone }}" class="hidden lg:flex items-center gap-2 text-sm font-semibold text-amber-400 hover:text-amber-300">
+                <a href="tel:{{ org.phone }}" class="hidden lg:flex items-center gap-2 text-sm font-semibold {{ template_cfg.accent_text_class }}">
                     <i class="fa-solid fa-phone"></i>
                     <span>{{ org.phone }}</span>
                 </a>
                 {% endif %}
-                <a href="#contacts" class="bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 font-bold px-5 py-2.5 rounded-xl hover:opacity-90 transition-opacity shadow-lg shadow-amber-500/25">
+                <a href="#contacts" class="{{ template_cfg.primary_btn_class }} px-5 py-2.5 {{ template_cfg.border_radius }} transition-all">
                     Записаться
                 </a>
             </div>
@@ -66,81 +98,83 @@
     </header>
 
     <!-- Hero Section -->
-    <section class="relative min-h-[85vh] flex items-center justify-center py-20 overflow-hidden bg-gradient-to-b {{ config.bg_gradient }}">
-        <div class="absolute inset-0 opacity-20 bg-[radial-gradient(#f59e0b_1px,transparent_1px)] [background-size:16px_16px]"></div>
+    <section class="relative min-h-[85vh] flex items-center justify-center py-20 overflow-hidden {{ template_cfg.hero_class }}">
+        <div class="absolute inset-0 opacity-15 bg-[radial-gradient(#f59e0b_1px,transparent_1px)] [background-size:16px_16px]"></div>
 
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 grid lg:grid-cols-12 gap-12 items-center">
-            <div class="lg:col-span-7 text-center lg:text-left space-y-6">
-                <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-amber-500/30 bg-amber-500/10 text-amber-400 text-sm font-medium">
-                    <i class="fa-solid fa-star text-amber-400"></i>
-                    <span>{{ config.badge }} в {{ org.city or 'городе' }}</span>
+            <div class="{% if template_cfg.hero_layout == 'centered' %}lg:col-span-12 text-center max-w-4xl mx-auto{% else %}lg:col-span-7 text-center lg:text-left{% endif %} space-y-6">
+                <div class="inline-flex items-center gap-2 px-3.5 py-1.5 {{ template_cfg.badge_class }} {{ template_cfg.border_radius }} text-sm font-medium">
+                    <i class="fa-solid fa-star"></i>
+                    <span>Шаблон #{{ template_cfg.id }} — {{ config.badge }} в {{ org.city or 'городе' }}</span>
                 </div>
-                <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white tracking-tight leading-[1.15]">
+                <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight leading-[1.15]">
                     {{ config.hero_title }}
                 </h1>
-                <p class="text-lg text-slate-300 max-w-2xl mx-auto lg:mx-0 font-normal leading-relaxed">
+                <p class="text-lg opacity-80 max-w-2xl {% if template_cfg.hero_layout == 'centered' %}mx-auto{% else %}mx-auto lg:mx-0{% endif %} font-normal leading-relaxed">
                     {{ org.description or config.hero_subtitle }}
                 </p>
 
-                <div class="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start pt-4">
-                    <a href="#contacts" class="inline-flex items-center justify-center gap-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold px-8 py-4 rounded-xl text-lg transition-all shadow-xl shadow-amber-500/20 hover:scale-[1.02]">
+                <div class="flex flex-col sm:flex-row gap-4 justify-center {% if template_cfg.hero_layout != 'centered' %}lg:justify-start{% endif %} pt-4">
+                    <a href="#contacts" class="{{ template_cfg.primary_btn_class }} inline-flex items-center justify-center gap-2 px-8 py-4 {{ template_cfg.border_radius }} text-lg transition-all hover:scale-[1.02]">
                         <span>Оставить заявку</span>
                         <i class="fa-solid fa-arrow-right"></i>
                     </a>
-                    <a href="#services" class="inline-flex items-center justify-center gap-2 bg-slate-900/80 hover:bg-slate-800 text-white font-semibold px-8 py-4 rounded-xl text-lg border border-slate-700 transition-all">
+                    <a href="#services" class="inline-flex items-center justify-center gap-2 bg-slate-900/80 hover:bg-slate-800 text-white font-semibold px-8 py-4 {{ template_cfg.border_radius }} text-lg border border-slate-700 transition-all">
                         <span>Услуги и прайс</span>
                     </a>
                 </div>
 
-                <!-- Quick Stats / Badges -->
-                <div class="pt-8 border-t border-slate-800/80 grid grid-cols-3 gap-4 text-center lg:text-left">
+                <!-- Quick Stats -->
+                <div class="pt-8 border-t border-slate-800/80 grid grid-cols-3 gap-4 text-center {% if template_cfg.hero_layout != 'centered' %}lg:text-left{% endif %}">
                     <div>
-                        <div class="text-2xl font-bold text-amber-400">100%</div>
-                        <div class="text-xs text-slate-400">Гарантия качества</div>
+                        <div class="text-2xl font-bold {{ template_cfg.accent_text_class }}">100%</div>
+                        <div class="text-xs opacity-70">Гарантия качества</div>
                     </div>
                     <div>
-                        <div class="text-2xl font-bold text-amber-400">24/7</div>
-                        <div class="text-xs text-slate-400">Онлайн прием</div>
+                        <div class="text-2xl font-bold {{ template_cfg.accent_text_class }}">24/7</div>
+                        <div class="text-xs opacity-70">Онлайн прием</div>
                     </div>
                     <div>
-                        <div class="text-2xl font-bold text-amber-400">4.9 ★</div>
-                        <div class="text-xs text-slate-400">Рейтинг клиентов</div>
+                        <div class="text-2xl font-bold {{ template_cfg.accent_text_class }}">4.9 ★</div>
+                        <div class="text-xs opacity-70">Рейтинг клиентов</div>
                     </div>
                 </div>
             </div>
 
+            {% if template_cfg.hero_layout != 'centered' %}
             <div class="lg:col-span-5 relative">
-                <div class="relative rounded-3xl overflow-hidden border border-slate-800 shadow-2xl shadow-amber-500/10 group">
+                <div class="relative {{ template_cfg.border_radius }} overflow-hidden border border-slate-800 shadow-2xl group">
                     <img src="{{ config.banner_img }}" alt="{{ org.name }}" class="w-full h-[450px] object-cover group-hover:scale-105 transition-transform duration-700">
                     <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent"></div>
-                    <div class="absolute bottom-6 left-6 right-6 p-6 bg-slate-900/90 backdrop-blur-md rounded-2xl border border-slate-800">
+                    <div class="absolute bottom-6 left-6 right-6 p-6 bg-slate-900/90 backdrop-blur-md {{ template_cfg.border_radius }} border border-slate-800">
                         <div class="flex items-center justify-between mb-2">
-                            <span class="text-sm font-semibold text-amber-400"><i class="fa-solid fa-location-dot mr-1.5"></i>{{ org.city or 'Локация' }}</span>
-                            <span class="text-xs text-slate-400">{{ org.working_hours or '09:00 - 21:00' }}</span>
+                            <span class="text-sm font-semibold {{ template_cfg.accent_text_class }}"><i class="fa-solid fa-location-dot mr-1.5"></i>{{ org.city or 'Локация' }}</span>
+                            <span class="text-xs opacity-70">{{ org.working_hours or '09:00 - 21:00' }}</span>
                         </div>
-                        <p class="text-white font-medium text-sm">{{ org.address or 'Уточняйте адрес по телефону' }}</p>
+                        <p class="font-medium text-sm">{{ org.address or 'Уточняйте адрес по телефону' }}</p>
                     </div>
                 </div>
             </div>
+            {% endif %}
         </div>
     </section>
 
     <!-- Features Section -->
-    <section id="features" class="py-24 bg-slate-900/50 relative border-t border-slate-800/50">
+    <section id="features" class="py-24 relative border-t border-slate-800/50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center max-w-3xl mx-auto mb-16 space-y-4">
-                <h2 class="text-xs font-bold uppercase tracking-widest text-amber-400">Почему выбирают нас</h2>
-                <p class="text-3xl sm:text-4xl font-extrabold text-white">Ключевые преимущества {{ org.name }}</p>
+                <h2 class="text-xs font-bold uppercase tracking-widest {{ template_cfg.accent_text_class }}">Почему выбирают нас</h2>
+                <p class="text-3xl sm:text-4xl font-extrabold">Ключевые преимущества {{ org.name }}</p>
             </div>
 
             <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
                 {% for feat in config.features %}
-                <div class="bg-slate-950 border border-slate-800 p-8 rounded-2xl hover:border-amber-500/50 transition-all group">
-                    <div class="w-14 h-14 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center text-2xl mb-6 group-hover:bg-amber-500 group-hover:text-slate-950 transition-all">
+                <div class="{{ template_cfg.card_class }} p-8 transition-all group">
+                    <div class="w-14 h-14 {{ template_cfg.border_radius }} {{ template_cfg.badge_class }} flex items-center justify-center text-2xl mb-6 group-hover:scale-110 transition-all">
                         <i class="fa-solid {{ feat.icon }}"></i>
                     </div>
-                    <h3 class="text-xl font-bold text-white mb-3">{{ feat.title }}</h3>
-                    <p class="text-slate-400 text-sm leading-relaxed">{{ feat.desc }}</p>
+                    <h3 class="text-xl font-bold mb-3">{{ feat.title }}</h3>
+                    <p class="opacity-75 text-sm leading-relaxed">{{ feat.desc }}</p>
                 </div>
                 {% endfor %}
             </div>
@@ -148,26 +182,26 @@
     </section>
 
     <!-- Services & Pricing Section -->
-    <section id="services" class="py-24 bg-slate-950">
+    <section id="services" class="py-24">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center max-w-3xl mx-auto mb-16 space-y-4">
-                <h2 class="text-xs font-bold uppercase tracking-widest text-amber-400">Прайс-лист</h2>
-                <p class="text-3xl sm:text-4xl font-extrabold text-white">Популярные услуги и цены</p>
+                <h2 class="text-xs font-bold uppercase tracking-widest {{ template_cfg.accent_text_class }}">Прайс-лист</h2>
+                <p class="text-3xl sm:text-4xl font-extrabold">Популярные услуги и цены</p>
             </div>
 
             <div class="grid md:grid-cols-2 gap-6 max-w-5xl mx-auto">
                 {% for service in config.services %}
-                <div class="bg-slate-900/60 border border-slate-800 p-6 rounded-2xl flex items-center justify-between hover:bg-slate-900 transition-colors">
+                <div class="{{ template_cfg.card_class }} p-6 flex items-center justify-between">
                     <div class="flex items-center gap-4">
-                        <div class="w-10 h-10 rounded-full bg-amber-500/10 text-amber-400 flex items-center justify-center font-bold">
+                        <div class="w-10 h-10 rounded-full {{ template_cfg.badge_class }} flex items-center justify-center font-bold">
                             <i class="fa-solid fa-check"></i>
                         </div>
                         <div>
-                            <h4 class="text-white font-semibold text-lg">{{ service.name }}</h4>
-                            <span class="text-xs text-slate-400">Гарантия и высокое качество</span>
+                            <h4 class="font-semibold text-lg">{{ service.name }}</h4>
+                            <span class="text-xs opacity-60">Гарантия и высокое качество</span>
                         </div>
                     </div>
-                    <div class="text-amber-400 font-bold text-lg bg-amber-500/10 px-4 py-2 rounded-xl border border-amber-500/20">
+                    <div class="{{ template_cfg.accent_text_class }} font-bold text-lg {{ template_cfg.badge_class }} px-4 py-2 {{ template_cfg.border_radius }}">
                         {{ service.price }}
                     </div>
                 </div>
@@ -176,44 +210,44 @@
         </div>
     </section>
 
-    <!-- Advantages / Why Us Section -->
-    <section id="about" class="py-24 bg-slate-900/30 border-t border-slate-800/50">
+    <!-- Advantages Section -->
+    <section id="about" class="py-24 border-t border-slate-800/50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid lg:grid-cols-2 gap-12 items-center">
             <div class="space-y-6">
-                <h2 class="text-xs font-bold uppercase tracking-widest text-amber-400">Наши стандарты</h2>
-                <h3 class="text-3xl sm:text-4xl font-extrabold text-white">Мы гарантируем лучший результат для каждого клиента</h3>
-                <p class="text-slate-300 leading-relaxed">
+                <h2 class="text-xs font-bold uppercase tracking-widest {{ template_cfg.accent_text_class }}">Наши стандарты</h2>
+                <h3 class="text-3xl sm:text-4xl font-extrabold">Мы гарантируем лучший результат для каждого клиента</h3>
+                <p class="opacity-80 leading-relaxed">
                     Компания {{ org.name }} работает с соблюдением высших стандартов качества. Мы дорожим своей репутацией и предлагаем клиентам лучшее сочетание цены и качества.
                 </p>
 
                 <div class="space-y-4 pt-2">
                     {% for adv in config.advantages %}
                     <div class="flex items-start gap-3">
-                        <div class="mt-1 w-5 h-5 rounded-full bg-amber-500 flex items-center justify-center text-slate-950 text-xs font-bold">✓</div>
-                        <p class="text-slate-200 font-medium">{{ adv }}</p>
+                        <div class="mt-1 w-5 h-5 rounded-full {{ template_cfg.badge_class }} flex items-center justify-center text-xs font-bold">✓</div>
+                        <p class="font-medium opacity-90">{{ adv }}</p>
                     </div>
                     {% endfor %}
                 </div>
             </div>
 
-            <div class="bg-gradient-to-br from-slate-900 to-amber-950/40 p-8 sm:p-10 rounded-3xl border border-slate-800 shadow-2xl">
-                <h3 class="text-2xl font-bold text-white mb-2">Оставить заявку на консультацию</h3>
-                <p class="text-slate-400 text-sm mb-6">Заполните форму и наш менеджер свяжется с вами в течение 5 минут.</p>
+            <div class="{{ template_cfg.card_class }} p-8 sm:p-10 shadow-2xl">
+                <h3 class="text-2xl font-bold mb-2">Оставить заявку на консультацию</h3>
+                <p class="opacity-70 text-sm mb-6">Заполните форму и наш менеджер свяжется с вами в течение 5 минут.</p>
 
                 <form onsubmit="handleFormSubmit(event)" class="space-y-4">
                     <div>
-                        <label class="block text-xs font-semibold text-slate-300 mb-1">Ваше имя</label>
-                        <input type="text" required placeholder="Иван" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-amber-500">
+                        <label class="block text-xs font-semibold opacity-80 mb-1">Ваше имя</label>
+                        <input type="text" required placeholder="Иван" class="w-full bg-slate-900/80 border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-amber-500">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-slate-300 mb-1">Номер телефона</label>
-                        <input type="tel" required placeholder="+7 (999) 000-00-00" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-amber-500">
+                        <label class="block text-xs font-semibold opacity-80 mb-1">Номер телефона</label>
+                        <input type="tel" required placeholder="+7 (999) 000-00-00" class="w-full bg-slate-900/80 border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-amber-500">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-slate-300 mb-1">Комментарий (необязательно)</label>
-                        <textarea rows="3" placeholder="Опишите ваш вопрос..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-amber-500"></textarea>
+                        <label class="block text-xs font-semibold opacity-80 mb-1">Комментарий (необязательно)</label>
+                        <textarea rows="3" placeholder="Опишите ваш вопрос..." class="w-full bg-slate-900/80 border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-amber-500"></textarea>
                     </div>
-                    <button type="submit" class="w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold py-4 rounded-xl transition-colors shadow-lg shadow-amber-500/20">
+                    <button type="submit" class="w-full {{ template_cfg.primary_btn_class }} py-4 {{ template_cfg.border_radius }} transition-colors shadow-lg">
                         Записаться прямо сейчас
                     </button>
                 </form>
@@ -222,40 +256,40 @@
     </section>
 
     <!-- Contacts Section -->
-    <section id="contacts" class="py-24 bg-slate-950 border-t border-slate-800">
+    <section id="contacts" class="py-24 border-t border-slate-800">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="grid lg:grid-cols-3 gap-8">
-                <div class="bg-slate-900/80 border border-slate-800 p-8 rounded-2xl space-y-4">
-                    <div class="w-12 h-12 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center text-xl">
+                <div class="{{ template_cfg.card_class }} p-8 space-y-4">
+                    <div class="w-12 h-12 {{ template_cfg.border_radius }} {{ template_cfg.badge_class }} flex items-center justify-center text-xl">
                         <i class="fa-solid fa-phone"></i>
                     </div>
-                    <h4 class="text-white font-bold text-lg">Телефон</h4>
-                    <p class="text-slate-400 text-sm">{{ org.phone or 'Не указан' }}</p>
+                    <h4 class="font-bold text-lg">Телефон</h4>
+                    <p class="opacity-75 text-sm">{{ org.phone or 'Не указан' }}</p>
                 </div>
 
-                <div class="bg-slate-900/80 border border-slate-800 p-8 rounded-2xl space-y-4">
-                    <div class="w-12 h-12 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center text-xl">
+                <div class="{{ template_cfg.card_class }} p-8 space-y-4">
+                    <div class="w-12 h-12 {{ template_cfg.border_radius }} {{ template_cfg.badge_class }} flex items-center justify-center text-xl">
                         <i class="fa-solid fa-location-dot"></i>
                     </div>
-                    <h4 class="text-white font-bold text-lg">Адрес</h4>
-                    <p class="text-slate-400 text-sm">{{ org.city }} {{ org.address or '' }}</p>
+                    <h4 class="font-bold text-lg">Адрес</h4>
+                    <p class="opacity-75 text-sm">{{ org.city }} {{ org.address or '' }}</p>
                 </div>
 
-                <div class="bg-slate-900/80 border border-slate-800 p-8 rounded-2xl space-y-4">
-                    <div class="w-12 h-12 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center text-xl">
+                <div class="{{ template_cfg.card_class }} p-8 space-y-4">
+                    <div class="w-12 h-12 {{ template_cfg.border_radius }} {{ template_cfg.badge_class }} flex items-center justify-center text-xl">
                         <i class="fa-solid fa-clock"></i>
                     </div>
-                    <h4 class="text-white font-bold text-lg">Режим работы</h4>
-                    <p class="text-slate-400 text-sm">{{ org.working_hours or 'Пн-Вс: 09:00 - 21:00' }}</p>
+                    <h4 class="font-bold text-lg">Режим работы</h4>
+                    <p class="opacity-75 text-sm">{{ org.working_hours or 'Пн-Вс: 09:00 - 21:00' }}</p>
                 </div>
             </div>
         </div>
     </section>
 
     <!-- Footer -->
-    <footer class="bg-slate-950 border-t border-slate-900 py-8">
-        <div class="max-w-7xl mx-auto px-4 text-center text-xs text-slate-500">
-            <p>© {{ org.name }}. Все права защищены. Страница сгенерирована платформой демо-портфолио.</p>
+    <footer class="border-t border-slate-900 py-8 text-center text-xs opacity-60">
+        <div class="max-w-7xl mx-auto px-4">
+            <p>© {{ org.name }}. Все права защищены. Просмотр шаблона дизайна #{{ template_cfg.id }} ({{ template_cfg.name }}).</p>
         </div>
     </footer>
 
@@ -267,7 +301,7 @@
         }
 
         function openOfferModal() {
-            alert('Понравился данный дизайн для {{ org.name }}?\nМы готовы разработать такой же качественный сайт с вашими контактами, ценами и логотипом!');
+            alert('Вам понравился Шаблон #{{ template_cfg.id }} ("{{ template_cfg.name }}") для {{ org.name }}?\nМы с радостью запустим для вас точно такой же лендинг с вашими логотипами, описаниями и услугами!');
         }
     </script>
 </body>
