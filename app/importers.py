@@ -40,7 +40,7 @@ def normalize_category(raw_category: str) -> str:
             return mapped
     return "general"
 
-def parse_csv_data(content: str) -> List[Dict[str, Any]]:
+def parse_csv_data(content: str, category_override: str = None) -> List[Dict[str, Any]]:
     # Detect delimiter
     sample = content[:2000]
     delimiter = ';' if ';' in sample and sample.count(';') > sample.count(',') else ','
@@ -62,9 +62,10 @@ def parse_csv_data(content: str) -> List[Dict[str, Any]]:
         description = lowered_row.get('description') or lowered_row.get('описание') or ''
         working_hours = lowered_row.get('working_hours') or lowered_row.get('часы работы') or lowered_row.get('режим работы') or ''
 
+        final_category = category_override if (category_override and category_override != "auto") else normalize_category(raw_cat)
         records.append({
             "name": name,
-            "category": normalize_category(raw_cat),
+            "category": final_category,
             "raw_category": raw_cat,
             "city": city,
             "address": address,
@@ -76,7 +77,7 @@ def parse_csv_data(content: str) -> List[Dict[str, Any]]:
         })
     return records
 
-def parse_json_data(content: str) -> List[Dict[str, Any]]:
+def parse_json_data(content: str, category_override: str = None) -> List[Dict[str, Any]]:
     data = json.loads(content)
     if isinstance(data, dict):
         if "items" in data:
@@ -98,9 +99,10 @@ def parse_json_data(content: str) -> List[Dict[str, Any]]:
         description = item.get('description') or item.get('описание') or ''
         working_hours = item.get('working_hours') or item.get('часы работы') or ''
 
+        final_category = category_override if (category_override and category_override != "auto") else normalize_category(raw_cat)
         records.append({
             "name": name,
-            "category": normalize_category(raw_cat),
+            "category": final_category,
             "raw_category": raw_cat,
             "city": city,
             "address": address,

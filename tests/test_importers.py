@@ -21,6 +21,14 @@ def test_parse_csv_data():
     assert records[1]["name"] == "СтройКомплект"
     assert records[1]["category"] == "construction"
 
+def test_parse_csv_data_category_override():
+    csv_content = """Название;Категория;Город
+Компания Разная;Разное;Москва
+"""
+    records = parse_csv_data(csv_content, category_override="beauty")
+    assert len(records) == 1
+    assert records[0]["category"] == "beauty"
+
 def test_parse_json_data():
     json_content = """[
         {"название": "Салон Красоты EVA", "категория": "Салон красоты", "город": "Казань"},

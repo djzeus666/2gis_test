@@ -45,6 +45,19 @@
                 <p class="text-xs text-slate-400 mb-6">Загрузите файл в формате .csv или .json со списком организаций из 2GIS</p>
 
                 <form action="/upload" method="post" enctype="multipart/form-data" class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-300 mb-1.5">Категория организаций & Дизайнов:</label>
+                        <select name="category_override" class="w-full bg-slate-900 border border-slate-700 text-slate-200 text-xs rounded-xl p-3 focus:outline-none focus:border-indigo-500 font-medium">
+                            <option value="auto">✨ Авто-определение из данных 2GIS</option>
+                            <option value="construction">🏗️ Строительство & Ремонт (Warm Amber / Blueprints)</option>
+                            <option value="auto">🚗 Автосервис & СТО (Neon Cyber / CAD Diagnostics)</option>
+                            <option value="beauty">💅 Салоны Красоты & SPA (Sunset Violet / Before-After)</option>
+                            <option value="medical">🏥 Медицинские Клиники (Emerald Eco / Checkups)</option>
+                            <option value="store">🛍️ Магазины & Ритейл (Clean Modern / Showcase)</option>
+                            <option value="general">💼 Общий Бизнес (Corporate Tech / Calculator)</option>
+                        </select>
+                    </div>
+
                     <div class="border-2 border-dashed border-slate-800 hover:border-indigo-500/50 rounded-xl p-6 text-center bg-slate-900/50 transition-colors">
                         <i class="fa-solid fa-cloud-arrow-up text-3xl text-slate-500 mb-2"></i>
                         <input type="file" name="file" accept=".csv, .json" required class="block w-full text-xs text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-indigo-600 file:text-white hover:file:bg-indigo-500 cursor-pointer">
