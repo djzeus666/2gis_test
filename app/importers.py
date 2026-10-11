@@ -62,7 +62,7 @@ def parse_csv_data(content: str, category_override: str = None) -> List[Dict[str
         description = lowered_row.get('description') or lowered_row.get('описание') or ''
         working_hours = lowered_row.get('working_hours') or lowered_row.get('часы работы') or lowered_row.get('режим работы') or ''
 
-        final_category = category_override if (category_override and category_override != "auto") else normalize_category(raw_cat)
+        final_category = category_override if (category_override and category_override not in ("auto_detect", "none", "")) else normalize_category(raw_cat)
         records.append({
             "name": name,
             "category": final_category,

@@ -171,7 +171,7 @@ CATEGORY_CONFIGS = {
         "primary_color": "amber",
         "default_template_id": 7,
         "interactive_type": "auto_diagnostic",
-        "blueprint_title": "Интерактивная CAD-диагностика автомобиля",
+        "blueprint_title": "Интерактивная диагностика автомобиля",
         "blueprint_subtitle": "Кликните на интересующий узел автомобиля, чтобы посмотреть параметры диагностики и регламентные работы",
         "hotspots": [
             {
@@ -243,8 +243,8 @@ CATEGORY_CONFIGS = {
         "primary_color": "blue",
         "default_template_id": 9,
         "interactive_type": "construction_blueprint",
-        "blueprint_title": "Интерактивный Архитектурный CAD-Чертеж",
-        "blueprint_subtitle": "Инженерный чертеж проекта с детализацией конструктивных узлов и материалов",
+        "blueprint_title": "Интерактивная Схема Объекта",
+        "blueprint_subtitle": "Инженерная схема проекта с детализацией конструктивных узлов и материалов",
         "hotspots": [
             {
                 "id": "foundation",
