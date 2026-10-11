@@ -99,7 +99,7 @@ def parse_json_data(content: str, category_override: str = None) -> List[Dict[st
         description = item.get('description') or item.get('описание') or ''
         working_hours = item.get('working_hours') or item.get('часы работы') or ''
 
-        final_category = category_override if (category_override and category_override != "auto") else normalize_category(raw_cat)
+        final_category = category_override if (category_override and category_override not in ("auto_detect", "none", "")) else normalize_category(raw_cat)
         records.append({
             "name": name,
             "category": final_category,
