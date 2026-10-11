@@ -4,7 +4,9 @@ TEMPLATES_CONFIG = {
     1: {
         "id": 1,
         "name": "Dark Neon Cyber",
-        "description": "Темный неоновый стиль с динамическим градиентом и подсвеченными акцентами",
+        "tag": "🔥 Хиты продаж",
+        "description": "Темный неоновый стиль с динамическим фиолетово-индиго градиентом и подсвеченными акцентами",
+        "swatch_gradient": "from-indigo-600 via-purple-600 to-slate-950",
         "style_class": "template-cyber",
         "bg_class": "bg-slate-950 text-slate-100",
         "header_class": "bg-slate-900/80 backdrop-blur-md border-b border-slate-800",
@@ -20,7 +22,9 @@ TEMPLATES_CONFIG = {
     2: {
         "id": 2,
         "name": "Clean Modern Light",
-        "description": "Светлый минималистичный дизайн с высокой читаемостью и контрастом",
+        "tag": "✨ Высокая конверсия",
+        "description": "Светлый минималистичный ультрачистый дизайн с высокой читаемостью и высокой конверсией",
+        "swatch_gradient": "from-blue-400 via-sky-200 to-white",
         "style_class": "template-light",
         "bg_class": "bg-gray-50 text-gray-900",
         "header_class": "bg-white/90 backdrop-blur-md border-b border-gray-200 shadow-sm",
@@ -36,7 +40,9 @@ TEMPLATES_CONFIG = {
     3: {
         "id": 3,
         "name": "Luxury Gold & Black",
-        "description": "Премиальный стиль в темных и золотых тонах для бутиков и элитных услуг",
+        "tag": "💎 Элитный класс",
+        "description": "Премиальный стиль в благородных темных и золотых тонах для элитных товаров и услуг",
+        "swatch_gradient": "from-amber-500 via-yellow-600 to-stone-950",
         "style_class": "template-luxury",
         "bg_class": "bg-stone-950 text-stone-100",
         "header_class": "bg-stone-900/90 backdrop-blur-md border-b border-amber-900/40",
@@ -52,7 +58,9 @@ TEMPLATES_CONFIG = {
     4: {
         "id": 4,
         "name": "Emerald Eco & Bio",
-        "description": "Свежая естественная гамма в изумрудно-зеленых оттенках",
+        "tag": "🌿 Свежесть & Эко",
+        "description": "Свежая естественная гамма в насыщенных изумрудно-зеленых оттенках органик стиля",
+        "swatch_gradient": "from-emerald-500 via-teal-600 to-zinc-950",
         "style_class": "template-emerald",
         "bg_class": "bg-zinc-950 text-zinc-100",
         "header_class": "bg-emerald-950/80 backdrop-blur-md border-b border-emerald-900/50",
@@ -68,7 +76,9 @@ TEMPLATES_CONFIG = {
     5: {
         "id": 5,
         "name": "Sunset Violet Glam",
-        "description": "Яркий закатно-фиолетовый стиль с мягким розоватым градиентом",
+        "tag": "💅 Красота & Стиль",
+        "description": "Яркий закатно-фиолетовый стильный шаблон с мягким розоватым перламутровым градиентом",
+        "swatch_gradient": "from-fuchsia-500 via-pink-600 to-neutral-950",
         "style_class": "template-sunset",
         "bg_class": "bg-neutral-950 text-neutral-100",
         "header_class": "bg-neutral-900/80 backdrop-blur-md border-b border-fuchsia-900/40",
@@ -84,7 +94,9 @@ TEMPLATES_CONFIG = {
     6: {
         "id": 6,
         "name": "Corporate Tech Navy",
-        "description": "Строгий деловой темно-синий стиль для корпоративных компаний и инженерии",
+        "tag": "💼 Деловая надежность",
+        "description": "Строгий деловой темно-синий стиль для серьезных компаний, инженерии и B2B",
+        "swatch_gradient": "from-blue-600 via-indigo-900 to-slate-950",
         "style_class": "template-navy",
         "bg_class": "bg-slate-900 text-slate-100",
         "header_class": "bg-slate-950/90 backdrop-blur-md border-b border-blue-900/50",
@@ -100,7 +112,9 @@ TEMPLATES_CONFIG = {
     7: {
         "id": 7,
         "name": "Crimson Fire Sport",
-        "description": "Динамичный насыщенный алый стиль для автотехники, спорта и драйва",
+        "tag": "⚡ Драйв & Энергия",
+        "description": "Динамичный насыщенный алый дезайн для автотехники, автоспорта и активного бизнеса",
+        "swatch_gradient": "from-red-600 via-rose-800 to-zinc-950",
         "style_class": "template-crimson",
         "bg_class": "bg-zinc-950 text-zinc-100",
         "header_class": "bg-zinc-900/90 backdrop-blur-md border-b border-red-900/40",
@@ -116,7 +130,9 @@ TEMPLATES_CONFIG = {
     8: {
         "id": 8,
         "name": "Cyan Ice Minimal",
-        "description": "Прохладный ледяной голубой стиль для медицины, клиник и высоких технологий",
+        "tag": "🏥 Чистота & Медицина",
+        "description": "Прохладный ледяной голубой стиль для медицины, клиник, IT и высоких технологий",
+        "swatch_gradient": "from-cyan-400 via-sky-600 to-slate-950",
         "style_class": "template-cyan",
         "bg_class": "bg-slate-950 text-slate-100",
         "header_class": "bg-slate-900/80 backdrop-blur-md border-b border-cyan-900/40",
@@ -132,7 +148,9 @@ TEMPLATES_CONFIG = {
     9: {
         "id": 9,
         "name": "Warm Amber Construction",
-        "description": "Теплый янтарно-оранжевый промышленный стиль для стройки и ремонта",
+        "tag": "🏗️ Промышленный & Стройка",
+        "description": "Теплый янтарно-оранжевый основательный стиль для стройки, ремонта и производства",
+        "swatch_gradient": "from-amber-500 via-orange-600 to-stone-950",
         "style_class": "template-amber",
         "bg_class": "bg-stone-950 text-stone-100",
         "header_class": "bg-stone-900/90 backdrop-blur-md border-b border-amber-900/40",
@@ -148,7 +166,9 @@ TEMPLATES_CONFIG = {
     10: {
         "id": 10,
         "name": "Futuristic Glassmorphic",
-        "description": "Ультрасовременный стеклянный стиль с эффектом размытия и полупрозрачности",
+        "tag": "🔮 Ультрасовременный",
+        "description": "Ультрасовременный стеклянный стиль с эффектом матового размытия и полупрозрачности",
+        "swatch_gradient": "from-teal-400 via-indigo-500 to-gray-950",
         "style_class": "template-glass",
         "bg_class": "bg-gray-950 text-gray-100",
         "header_class": "bg-white/10 backdrop-blur-lg border-b border-white/10 shadow-2xl",
@@ -165,11 +185,12 @@ TEMPLATES_CONFIG = {
 
 CATEGORY_CONFIGS = {
     "auto": {
-        "badge": "Автосервис & Детейлинг",
-        "hero_title": "Профессиональный ремонт и обслуживание вашего авто",
-        "hero_subtitle": "Гарантия на все работы, современные диагносты и качественные запчасти в наличии.",
+        "badge": "Автосервис & Детейлинг №1",
+        "hero_title": "Профессиональный ремонт и обслуживание авто с гарантией 1 год",
+        "hero_subtitle": "Бесплатная компьютерная диагностика при первом посещении. Честная сметная стоимость без скрытых переплат.",
         "primary_color": "amber",
         "default_template_id": 7,
+        "urgency_text": "🔥 Акция недели: Компьютерная диагностика + осмотр подвески за 0 ₽ при записи сегодня!",
         "interactive_type": "auto_diagnostic",
         "blueprint_title": "Интерактивная диагностика автомобиля",
         "blueprint_subtitle": "Кликните на интересующий узел автомобиля, чтобы посмотреть параметры диагностики и регламентные работы",
@@ -233,6 +254,14 @@ CATEGORY_CONFIGS = {
             "Собственный склад оригинальных запчастей и аналогов",
             "Комфортная зона ожидания с кофейней, Wi-Fi и ТВ",
             "Прозрачная сметная стоимость до начала ремонта"
+        ],
+        "reviews": [
+            {"name": "Алексей В.", "role": "Владелец Toyota Camry", "text": "Быстро нашли стук в подвеске, хотя в двух других сервисах предлагали менять всю стойку. Честные ребята!", "rating": 5},
+            {"name": "Елена М.", "role": "Владелица Kia Rio", "text": "Сделали ТО за 40 минут. Комфортная зона ожидания и приятные цены. Теперь только к вам!", "rating": 5}
+        ],
+        "faqs": [
+            {"q": "Даете ли вы официальную гарантию на работы?", "a": "Да, мы предоставляем официальную гарантию до 12 месяцев на все выполненные работы и установленные запчасти."},
+            {"q": "Можно ли присутствовать в ремзоне?", "a": "Да, у нас открытая ремзона и вы можете лично наблюдать за ремонтом вашего автомобиля."}
         ],
         "banner_img": "https://images.unsplash.com/photo-1486006920555-c77dce18193b?auto=format&fit=crop&w=1200&q=80"
     },

@@ -53,37 +53,103 @@
 </head>
 <body class="{{ template_cfg.bg_class }} {{ template_cfg.font_family }} antialiased selection:bg-amber-500 selection:text-slate-950 pb-28">
 
-    <!-- Top Floating Template Switcher Bar -->
-    <div class="fixed bottom-0 left-0 right-0 z-50 bg-slate-950/95 border-t border-slate-800 backdrop-blur-xl px-4 py-3 shadow-2xl text-slate-100">
+    <!-- Visual Template Selector Gallery Drawer / Modal Trigger -->
+    <div class="fixed bottom-0 left-0 right-0 z-50 bg-slate-950/95 border-t border-indigo-500/30 backdrop-blur-2xl px-4 py-3 shadow-2xl text-slate-100">
         <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-3">
-            <div class="flex items-center gap-2 text-xs md:text-sm font-semibold">
-                <span class="w-3 h-3 rounded-full bg-emerald-500 animate-pulse"></span>
-                <span class="text-slate-400">Переключение дизайна (10 вариантов):</span>
-                <span class="text-white bg-slate-800 px-2.5 py-1 rounded-lg border border-slate-700">
-                    #{{ template_cfg.id }} — {{ template_cfg.name }}
-                </span>
+            <div class="flex items-center gap-3">
+                <button onclick="toggleTemplateGallery()" class="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 hover:scale-105 text-white font-extrabold text-xs px-4 py-2 rounded-xl shadow-lg shadow-indigo-500/30 flex items-center gap-2 transition-all">
+                    <i class="fa-solid fa-palette text-amber-300"></i>
+                    <span>Выбрать из 10 Шаблонов Дизайна</span>
+                    <span class="bg-white/20 text-white text-[10px] px-2 py-0.5 rounded-full font-mono">10 дизайнов</span>
+                </button>
+                <div class="hidden sm:flex items-center gap-2 text-xs">
+                    <span class="text-slate-400">Текущий:</span>
+                    <span class="text-amber-400 font-bold bg-slate-900 px-3 py-1 rounded-lg border border-slate-800">
+                        #{{ template_cfg.id }} — {{ template_cfg.name }}
+                    </span>
+                </div>
             </div>
 
-            <!-- Scrollable Template Buttons -->
-            <div class="flex items-center gap-1.5 overflow-x-auto max-w-full pb-1 md:pb-0 scrollbar-none">
+            <!-- Quick Swatch Bar -->
+            <div class="flex items-center gap-2 overflow-x-auto max-w-full pb-1 md:pb-0">
                 {% for t_id, t_item in all_templates.items() %}
                 <a href="/demo/{{ org.id }}?template={{ t_id }}"
-                   class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all whitespace-nowrap flex items-center gap-1.5
-                   {% if t_id == template_cfg.id %}
-                       bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 shadow-md shadow-amber-500/20 scale-105 ring-2 ring-amber-400
-                   {% else %}
-                       bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800
-                   {% endif %}">
-                    <span>#{{ t_id }}</span>
-                    <span class="hidden lg:inline font-normal opacity-80">{{ t_item.name }}</span>
+                   title="{{ t_item.name }} ({{ t_item.tag }})"
+                   class="relative group p-1 rounded-xl transition-all
+                   {% if t_id == template_cfg.id %}ring-2 ring-amber-400 scale-110 shadow-lg shadow-amber-500/30{% else %}hover:scale-105 opacity-80 hover:opacity-100{% endif %}">
+                    <div class="w-8 h-8 rounded-lg bg-gradient-to-tr {{ t_item.swatch_gradient }} flex items-center justify-center font-black text-[11px] text-white shadow-inner">
+                        {{ t_id }}
+                    </div>
                 </a>
                 {% endfor %}
             </div>
 
             <div class="hidden xl:flex items-center gap-2">
-                <a href="#offer-modal" onclick="openOfferModal()" class="{{ template_cfg.primary_btn_class }} px-4 py-1.5 rounded-xl text-xs uppercase tracking-wider font-extrabold">
-                    Заказать данный шаблон
+                <a href="#offer-modal" onclick="openOfferModal()" class="{{ template_cfg.primary_btn_class }} px-4 py-2 rounded-xl text-xs uppercase tracking-wider font-extrabold shadow-lg">
+                    <i class="fa-solid fa-rocket mr-1"></i> Заказать сайт
                 </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Beautiful Visual Template Selector Modal -->
+    <div id="template-gallery-modal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
+        <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-5xl w-full max-h-[90vh] flex flex-col overflow-hidden shadow-2xl relative animate-float">
+            <!-- Modal Header -->
+            <div class="p-6 border-b border-slate-800 flex items-center justify-between bg-slate-950/80">
+                <div>
+                    <div class="inline-flex items-center gap-2 text-xs font-mono uppercase text-indigo-400 mb-1">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i> Галерея Готовых Дизайнов
+                    </div>
+                    <h3 class="text-2xl font-extrabold text-white">Выберите идеальный стиль для {{ org.name }}</h3>
+                </div>
+                <button onclick="toggleTemplateGallery()" class="w-10 h-10 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center text-lg font-bold">
+                    ✕
+                </button>
+            </div>
+
+            <!-- Modal Content (Grid of 10 Visual Templates) -->
+            <div class="p-6 overflow-y-auto grid md:grid-cols-2 lg:grid-cols-3 gap-6 bg-slate-950/50">
+                {% for t_id, t_item in all_templates.items() %}
+                <a href="/demo/{{ org.id }}?template={{ t_id }}" class="group relative bg-slate-900 border border-slate-800 hover:border-indigo-500/60 rounded-2xl p-5 shadow-xl transition-all duration-300 hover:-translate-y-1 flex flex-col justify-between">
+                    <div class="space-y-3">
+                        <div class="h-28 rounded-xl bg-gradient-to-tr {{ t_item.swatch_gradient }} p-4 relative overflow-hidden shadow-inner flex flex-col justify-between">
+                            <div class="flex justify-between items-start">
+                                <span class="bg-slate-950/80 text-white font-mono text-xs font-extrabold px-2.5 py-1 rounded-md border border-white/10">
+                                    #{{ t_id }}
+                                </span>
+                                <span class="bg-amber-400 text-slate-950 font-bold text-[10px] px-2 py-0.5 rounded-full shadow">
+                                    {{ t_item.tag }}
+                                </span>
+                            </div>
+                            <div class="text-white font-extrabold text-lg tracking-wide drop-shadow-md">
+                                {{ t_item.name }}
+                            </div>
+                        </div>
+
+                        <div>
+                            <p class="text-xs text-slate-300 leading-relaxed">{{ t_item.description }}</p>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 pt-3 border-t border-slate-800/80 flex items-center justify-between">
+                        {% if t_id == template_cfg.id %}
+                        <span class="text-xs font-bold text-emerald-400 flex items-center gap-1">
+                            <i class="fa-solid fa-circle-check"></i> Активный шаблон
+                        </span>
+                        {% else %}
+                        <span class="text-xs font-bold text-indigo-400 group-hover:text-amber-300 transition-colors flex items-center gap-1">
+                            <span>Применить дизайн</span> &rarr;
+                        </span>
+                        {% endif %}
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="p-4 border-t border-slate-800 bg-slate-950 text-center text-xs text-slate-400">
+                Все шаблоны полностью адаптированы под ПК, планшеты и смартфоны.
             </div>
         </div>
     </div>
@@ -136,6 +202,20 @@
         </div>
     </header>
 
+    <!-- Urgency Promo Bar -->
+    <div class="bg-gradient-to-r from-amber-500 via-orange-500 to-rose-600 text-slate-950 font-bold text-xs sm:text-sm py-2.5 px-4 shadow-lg border-b border-amber-400/30">
+        <div class="max-w-7xl mx-auto flex flex-wrap justify-between items-center gap-2">
+            <div class="flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-slate-950 animate-ping"></span>
+                <span>{{ config.urgency_text or '🔥 Спецпредложение: Скидка 15% на первый заказ при записи через сайт сегодня!' }}</span>
+            </div>
+            <div class="flex items-center gap-2 bg-slate-950/10 px-3 py-1 rounded-lg text-xs font-mono">
+                <span>До конца акции:</span>
+                <span id="countdown-timer" class="font-extrabold">04:59:50</span>
+            </div>
+        </div>
+    </div>
+
     <!-- Hero Section -->
     <section class="relative min-h-[85vh] flex items-center justify-center py-20 overflow-hidden {{ template_cfg.hero_class }}">
         <div class="absolute inset-0 opacity-15 bg-[radial-gradient(#f59e0b_1px,transparent_1px)] [background-size:16px_16px]"></div>
@@ -143,7 +223,7 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 grid lg:grid-cols-12 gap-12 items-center">
             <div class="{% if template_cfg.hero_layout == 'centered' %}lg:col-span-12 text-center max-w-4xl mx-auto{% else %}lg:col-span-7 text-center lg:text-left{% endif %} space-y-6">
                 <div class="inline-flex items-center gap-2 px-3.5 py-1.5 {{ template_cfg.badge_class }} {{ template_cfg.border_radius }} text-sm font-medium">
-                    <i class="fa-solid fa-star"></i>
+                    <i class="fa-solid fa-fire-flame-curved text-amber-400"></i>
                     <span>Шаблон #{{ template_cfg.id }} — {{ config.badge }} в {{ org.city or 'городе' }}</span>
                 </div>
                 <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight leading-[1.15]">
@@ -476,6 +556,81 @@
         </div>
     </section>
 
+    <!-- Client Reviews / Social Proof Section -->
+    <section class="py-20 border-t border-slate-800/80 bg-slate-950/60">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-3xl mx-auto mb-16 space-y-3">
+                <div class="inline-flex items-center gap-2 px-3 py-1 bg-amber-500/10 text-amber-400 border border-amber-500/30 rounded-full text-xs font-mono uppercase">
+                    ★ Отзывы довольных клиентов
+                </div>
+                <h2 class="text-3xl sm:text-4xl font-extrabold text-white">Что о нас говорят заказчики</h2>
+            </div>
+
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {% set default_reviews = [
+                    {"name": "Михаил С.", "role": "Постоянный клиент", "text": "Превосходный сервис! Оформил заявку через сайт, перезвонили в течение 3 минут. Все сделано идеально в срок.", "rating": 5},
+                    {"name": "Анна К.", "role": "Первичный визит", "text": "Очень приветливый персонал, высокое качество и прозрачные цены. Буду рекомендовать друзьям!", "rating": 5},
+                    {"name": "Дмитрий П.", "role": "Клиент компании", "text": "Спасибо за оперативное решение моей проблемы. Отдельная благодарность за скидку по акции!", "rating": 5}
+                ] %}
+                {% for rev in config.reviews or default_reviews %}
+                <div class="{{ template_cfg.card_class }} p-8 space-y-4 shadow-xl">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-1 text-amber-400 text-sm">
+                            <i class="fa-solid fa-star"></i>
+                            <i class="fa-solid fa-star"></i>
+                            <i class="fa-solid fa-star"></i>
+                            <i class="fa-solid fa-star"></i>
+                            <i class="fa-solid fa-star"></i>
+                        </div>
+                        <span class="text-xs opacity-50 font-mono">Проверенный отзыв</span>
+                    </div>
+                    <p class="opacity-90 text-sm leading-relaxed italic">«{{ rev.text }}»</p>
+                    <div class="pt-4 border-t border-slate-800/80 flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-amber-500 to-orange-500 text-slate-950 font-bold flex items-center justify-center text-sm shadow">
+                            {{ rev.name[0] }}
+                        </div>
+                        <div>
+                            <div class="font-bold text-sm text-white">{{ rev.name }}</div>
+                            <div class="text-xs opacity-60">{{ rev.role }}</div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ Accordion Section -->
+    <section class="py-20 border-t border-slate-800/80">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12 space-y-3">
+                <h2 class="text-3xl sm:text-4xl font-extrabold text-white">Часто задаваемые вопросы</h2>
+                <p class="text-slate-400 text-sm">Ответы на самые популярные вопросы наших клиентов</p>
+            </div>
+
+            <div class="space-y-4">
+                {% set default_faqs = [
+                    {"q": "Как быстро вы связываетесь после отправки заявки?", "a": "Наш менеджер перезванивает в течение 3-5 минут в рабочее время с 09:00 до 21:00."},
+                    {"q": "Предоставляются ли скидки при онлайн-записи?", "a": "Да, при первой записи через наш сайт вы автоматически получаете гарантированную скидку или бонус."},
+                    {"q": "Какие варианты оплаты вы принимаете?", "a": "Мы принимаем банковские карты, наличные, переводы СБП и работу по безналичному расчету с юр. лицами."}
+                ] %}
+                {% for faq in config.faqs or default_faqs %}
+                <details class="{{ template_cfg.card_class }} p-6 rounded-2xl group cursor-pointer transition-all">
+                    <summary class="font-bold text-base text-white flex justify-between items-center list-none">
+                        <span>{{ faq.q }}</span>
+                        <span class="w-8 h-8 rounded-full bg-slate-800 group-open:rotate-180 transition-transform flex items-center justify-center text-xs text-amber-400">
+                            ▼
+                        </span>
+                    </summary>
+                    <p class="mt-4 text-sm opacity-80 leading-relaxed pt-3 border-t border-slate-800/60">
+                        {{ faq.a }}
+                    </p>
+                </details>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
     <!-- Contacts Section -->
     <section id="contacts" class="py-24 border-t border-slate-800">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -516,6 +671,24 @@
 
     <!-- Interactive Scripts -->
     <script>
+        function toggleTemplateGallery() {
+            const modal = document.getElementById('template-gallery-modal');
+            if (modal) {
+                modal.classList.toggle('hidden');
+            }
+        }
+
+        // Countdown timer for urgency bar
+        let timerSeconds = 17990;
+        setInterval(() => {
+            if (timerSeconds > 0) timerSeconds--;
+            const hrs = String(Math.floor(timerSeconds / 3600)).padStart(2, '0');
+            const mins = String(Math.floor((timerSeconds % 3600) / 60)).padStart(2, '0');
+            const secs = String(timerSeconds % 60).padStart(2, '0');
+            const timerEl = document.getElementById('countdown-timer');
+            if (timerEl) timerEl.textContent = `${hrs}:${mins}:${secs}`;
+        }, 1000);
+
         function handleFormSubmit(e) {
             e.preventDefault();
             alert('Спасибо за заявку! В ближайшее время с вами свяжется менеджер {{ org.name }}.');
