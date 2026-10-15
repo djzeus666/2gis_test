@@ -11,6 +11,53 @@
 </head>
 <body class="bg-slate-900 text-slate-100 antialiased min-h-screen flex flex-col">
 
+    <!-- Interactive Device Preview Modal -->
+    <div id="device-preview-modal" class="fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-md flex flex-col hidden">
+        <!-- Modal Toolbar -->
+        <div class="bg-slate-900 border-b border-slate-800 px-6 py-3 flex items-center justify-between text-white">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center font-bold text-sm">
+                    <i class="fa-solid fa-mobile-screen"></i>
+                </div>
+                <div>
+                    <span id="preview-org-name" class="font-bold text-sm block">Предпросмотр сайта</span>
+                    <span id="preview-url-text" class="text-xs text-slate-400 font-mono">http://localhost/demo/...</span>
+                </div>
+            </div>
+
+            <!-- Device Switcher Buttons -->
+            <div class="flex items-center gap-2 bg-slate-950 p-1 rounded-xl border border-slate-800">
+                <button onclick="setDeviceWidth('100%', this)" class="device-btn active px-3 py-1.5 rounded-lg text-xs font-bold bg-indigo-600 text-white flex items-center gap-1.5">
+                    <i class="fa-solid fa-desktop"></i>
+                    <span class="hidden sm:inline">Desktop</span>
+                </button>
+                <button onclick="setDeviceWidth('768px', this)" class="device-btn px-3 py-1.5 rounded-lg text-xs font-bold text-slate-400 hover:text-white flex items-center gap-1.5">
+                    <i class="fa-solid fa-tablet-screen-button"></i>
+                    <span class="hidden sm:inline">Tablet (768px)</span>
+                </button>
+                <button onclick="setDeviceWidth('375px', this)" class="device-btn px-3 py-1.5 rounded-lg text-xs font-bold text-slate-400 hover:text-white flex items-center gap-1.5">
+                    <i class="fa-solid fa-mobile-screen-button"></i>
+                    <span class="hidden sm:inline">Mobile (375px)</span>
+                </button>
+            </div>
+
+            <div class="flex items-center gap-3">
+                <a id="preview-external-link" href="#" target="_blank" class="text-xs text-amber-400 hover:text-amber-300 font-bold flex items-center gap-1">
+                    <span>Открыть в новом окне</span>
+                    <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+                </a>
+                <button onclick="closeDevicePreview()" class="w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center font-bold">✕</button>
+            </div>
+        </div>
+
+        <!-- iframe Container -->
+        <div class="flex-1 bg-slate-950 flex items-center justify-center p-4 overflow-hidden">
+            <div id="preview-frame-wrapper" class="w-full h-full transition-all duration-300 bg-white rounded-2xl overflow-hidden shadow-2xl border border-slate-800">
+                <iframe id="preview-iframe" src="" class="w-full h-full border-0"></iframe>
+            </div>
+        </div>
+    </div>
+
     <!-- Header -->
     <header class="bg-slate-950 border-b border-slate-800 py-4 px-6 sticky top-0 z-30">
         <div class="max-w-7xl mx-auto flex items-center justify-between">
@@ -20,12 +67,15 @@
                 </div>
                 <div>
                     <h1 class="text-lg font-bold text-white leading-none">2GIS Site Generator & КП</h1>
-                    <span class="text-xs text-slate-400">Управление организациями и КП</span>
+                    <span class="text-xs text-slate-400">Управление организациями, лидами и КП</span>
                 </div>
             </div>
-            <div class="flex items-center gap-4 text-sm">
-                <span class="bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 px-3 py-1 rounded-full font-medium">
-                    Всего организаций: <strong>{{ organizations|length }}</strong>
+            <div class="flex items-center gap-3 text-xs">
+                <span class="bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 px-3 py-1.5 rounded-full font-medium">
+                    Организаций: <strong>{{ organizations|length }}</strong>
+                </span>
+                <span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-3 py-1.5 rounded-full font-medium">
+                    Лидов/Заявок: <strong>{{ leads|length }}</strong>
                 </span>
             </div>
         </div>
@@ -50,11 +100,12 @@
                         <select name="category_override" class="w-full bg-slate-900 border border-slate-700 text-slate-200 text-xs rounded-xl p-3 focus:outline-none focus:border-indigo-500 font-medium">
                             <option value="auto_detect">✨ Авто-определение из данных 2GIS</option>
                             <option value="construction">🏗️ Строительство & Ремонт (Warm Amber)</option>
-                            <option value="auto">🚗 Автосервис & СТО (Neon Cyber)</option>
+                            <option value="auto">🚗 Автосервис & СТО (Neon Drive)</option>
                             <option value="beauty">💅 Салоны Красоты & SPA (Sunset Violet / Before-After)</option>
                             <option value="medical">🏥 Медицинские Клиники (Emerald Eco / Checkups)</option>
                             <option value="store">🛍️ Магазины & Ритейл (Clean Modern / Showcase)</option>
-                            <option value="general">💼 Общий Бизнес (Corporate Tech / Calculator)</option>
+                            <option value="corporate">💼 Корпоративный B2B (Navy Violet)</option>
+                            <option value="general">🎓 Общие услуги & Калькулятор (Luxury Gold / Sky Education)</option>
                         </select>
                     </div>
 
@@ -88,10 +139,73 @@
             </div>
         </div>
 
+        <!-- LEADS / APPLICATIONS SECTION -->
+        <div class="bg-slate-950 border border-slate-800 rounded-2xl overflow-hidden shadow-xl">
+            <div class="p-6 border-b border-slate-800 flex justify-between items-center">
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-inbox text-emerald-400 text-lg"></i>
+                    <h3 class="text-lg font-bold text-white">Входящие Заявки / Лиды ({{ leads|length }})</h3>
+                </div>
+                <span class="text-xs text-slate-400">Заявки с демо-лендингов попадают сюда в реальном времени</span>
+            </div>
+
+            {% if not leads %}
+            <div class="py-12 text-center text-slate-500 space-y-2">
+                <i class="fa-solid fa-clipboard-check text-3xl text-slate-600"></i>
+                <p class="text-xs">Заявок пока нет. Отправьте тестовую заявку с любого демо-лендинга.</p>
+            </div>
+            {% else %}
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-sm text-slate-300">
+                    <thead class="bg-slate-900/80 text-xs uppercase font-semibold text-slate-400 border-b border-slate-800">
+                        <tr>
+                            <th class="px-6 py-4">Клиент</th>
+                            <th class="px-6 py-4">Телефон</th>
+                            <th class="px-6 py-4">Компания / Комментарий</th>
+                            <th class="px-6 py-4">Дата</th>
+                            <th class="px-6 py-4 text-center">Статус</th>
+                            <th class="px-6 py-4 text-center">Действия</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-800/60">
+                        {% for lead in leads %}
+                        <tr class="hover:bg-slate-900/40 transition-colors">
+                            <td class="px-6 py-4 font-bold text-white">{{ lead.client_name }}</td>
+                            <td class="px-6 py-4 font-mono text-xs text-amber-400 font-bold">{{ lead.phone }}</td>
+                            <td class="px-6 py-4 text-xs">
+                                <div class="font-semibold text-slate-200">{{ lead.organization.name if lead.organization else 'Организация' }}</div>
+                                <div class="text-slate-400 italic">{{ lead.comment or 'Без комментария' }}</div>
+                            </td>
+                            <td class="px-6 py-4 text-xs text-slate-400 font-mono">
+                                {{ lead.created_at.strftime('%d.%m.%Y %H:%M') if lead.created_at else '' }}
+                            </td>
+                            <td class="px-6 py-4 text-center">
+                                {% if lead.status == 'new' %}
+                                <span class="bg-rose-500/10 text-rose-400 border border-rose-500/30 px-2.5 py-1 rounded-full text-[11px] font-bold">Новая</span>
+                                {% elif lead.status == 'contacted' %}
+                                <span class="bg-amber-500/10 text-amber-400 border border-amber-500/30 px-2.5 py-1 rounded-full text-[11px] font-bold">В обработке</span>
+                                {% else %}
+                                <span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 px-2.5 py-1 rounded-full text-[11px] font-bold">Завершена</span>
+                                {% endif %}
+                            </td>
+                            <td class="px-6 py-4 text-center">
+                                <div class="flex items-center justify-center gap-2">
+                                    <button onclick="updateLeadStatus('{{ lead.id }}', 'contacted')" class="text-[11px] bg-slate-800 hover:bg-slate-700 text-slate-200 px-2.5 py-1 rounded-md">В работу</button>
+                                    <button onclick="updateLeadStatus('{{ lead.id }}', 'closed')" class="text-[11px] bg-emerald-600 hover:bg-emerald-500 text-white px-2.5 py-1 rounded-md">Закрыть</button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% endif %}
+        </div>
+
         <!-- Organizations Table -->
         <div class="bg-slate-950 border border-slate-800 rounded-2xl overflow-hidden shadow-xl">
             <div class="p-6 border-b border-slate-800 flex flex-wrap justify-between items-center gap-4">
-                <h3 class="text-lg font-bold text-white">Список организаций</h3>
+                <h3 class="text-lg font-bold text-white">Список организацийиз 2GIS ({{ organizations|length }})</h3>
 
                 {% if organizations %}
                 <form action="/delete-all" method="post" onsubmit="return confirm('Вы уверены, что хотите удалить все организации?');">
@@ -115,7 +229,7 @@
                             <th class="px-6 py-4">Организация</th>
                             <th class="px-6 py-4">Категория</th>
                             <th class="px-6 py-4">Контакты</th>
-                            <th class="px-6 py-4 text-center">Демо-Сайт</th>
+                            <th class="px-6 py-4 text-center">Предпросмотр (Device)</th>
                             <th class="px-6 py-4 text-center">Копирование КП</th>
                         </tr>
                     </thead>
@@ -136,10 +250,10 @@
                                 {% if org.email %}<div><i class="fa-solid fa-envelope text-slate-500 mr-1"></i>{{ org.email }}</div>{% endif %}
                             </td>
                             <td class="px-6 py-4 text-center">
-                                <a href="/demo/{{ org.id }}" target="_blank" class="inline-flex items-center gap-1.5 bg-amber-500/10 text-amber-400 hover:bg-amber-500 hover:text-slate-950 px-3 py-1.5 rounded-lg border border-amber-500/30 font-semibold text-xs transition-all">
-                                    <span>Открыть сайт</span>
-                                    <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
-                                </a>
+                                <button onclick="openDevicePreview('{{ org.name }}', '/demo/{{ org.id }}')" class="inline-flex items-center gap-1.5 bg-amber-500/10 text-amber-400 hover:bg-amber-500 hover:text-slate-950 px-3 py-1.5 rounded-lg border border-amber-500/30 font-semibold text-xs transition-all">
+                                    <i class="fa-solid fa-eye text-xs"></i>
+                                    <span>Предпросмотр</span>
+                                </button>
                             </td>
                             <td class="px-6 py-4 text-center">
                                 <button onclick="copyKP('{{ org.name }}', '{{ host_url }}/demo/{{ org.id }}', '{{ org.category }}')" class="bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-1.5 rounded-lg font-semibold text-xs shadow transition-all flex items-center justify-center gap-1.5 mx-auto">
@@ -173,6 +287,39 @@
                     toast.classList.add('hidden');
                 }, 3000);
             });
+        }
+
+        // Device Preview Functions
+        function openDevicePreview(orgName, demoUrl) {
+            document.getElementById('preview-org-name').textContent = 'Предпросмотр: ' + orgName;
+            document.getElementById('preview-url-text').textContent = window.location.origin + demoUrl;
+            document.getElementById('preview-iframe').src = demoUrl;
+            document.getElementById('preview-external-link').href = demoUrl;
+            document.getElementById('device-preview-modal').classList.remove('hidden');
+        }
+
+        function closeDevicePreview() {
+            document.getElementById('device-preview-modal').classList.add('hidden');
+            document.getElementById('preview-iframe').src = '';
+        }
+
+        function setDeviceWidth(width, btn) {
+            document.querySelectorAll('.device-btn').forEach(b => {
+                b.classList.remove('bg-indigo-600', 'text-white', 'active');
+                b.classList.add('text-slate-400');
+            });
+            btn.classList.add('bg-indigo-600', 'text-white', 'active');
+            btn.classList.remove('text-slate-400');
+
+            const wrapper = document.getElementById('preview-frame-wrapper');
+            if (wrapper) wrapper.style.maxWidth = width;
+        }
+
+        async function updateLeadStatus(leadId, newStatus) {
+            const formData = new FormData();
+            formData.append('status', newStatus);
+            await fetch(`/admin/leads/${leadId}/status`, { method: 'POST', body: formData });
+            window.location.reload();
         }
     </script>
 </body>

@@ -14,7 +14,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 
     <style>
-        /* Scheme Grid Background */
         .blueprint-grid {
             background-size: 30px 30px;
             background-image:
@@ -22,7 +21,6 @@
                 linear-gradient(to bottom, rgba(56, 189, 248, 0.08) 1px, transparent 1px);
         }
 
-        /* Animated Scan Line */
         @keyframes scanline {
             0% { transform: translateY(-100%); }
             100% { transform: translateY(1000%); }
@@ -31,7 +29,6 @@
             animation: scanline 8s linear infinite;
         }
 
-        /* Pulse Glowing Hotspots */
         @keyframes radar-pulse {
             0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.7); }
             70% { transform: scale(1.15); box-shadow: 0 0 0 15px rgba(245, 158, 11, 0); }
@@ -41,19 +38,55 @@
             animation: radar-pulse 2s infinite;
         }
 
-        /* Float animation */
-        @keyframes float-slow {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
+        @keyframes slide-in-left {
+            0% { transform: translateX(-120%); opacity: 0; }
+            100% { transform: translateX(0); opacity: 1; }
         }
-        .animate-float {
-            animation: float-slow 4s ease-in-out infinite;
+        .animate-toast {
+            animation: slide-in-left 0.5s ease-out forwards;
         }
     </style>
 </head>
 <body class="{{ template_cfg.bg_class }} {{ template_cfg.font_family }} antialiased selection:bg-amber-500 selection:text-slate-950 pb-28">
 
-    <!-- Visual Template Selector Gallery Drawer / Modal Trigger -->
+    <!-- Live Social Proof Toast Popup (Dynamic Activity Feed) -->
+    <div id="live-social-toast" class="fixed bottom-20 left-4 z-40 max-w-sm bg-slate-900/95 border border-emerald-500/40 text-slate-100 p-4 rounded-2xl shadow-2xl backdrop-blur-md hidden animate-toast">
+        <div class="flex items-start gap-3">
+            <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-emerald-500 to-teal-400 flex items-center justify-center text-slate-950 font-bold text-sm shrink-0 shadow">
+                <i class="fa-solid fa-bell animate-bounce"></i>
+            </div>
+            <div class="flex-1 text-xs space-y-0.5">
+                <div class="font-bold text-white flex justify-between items-center">
+                    <span id="toast-user-name">Алексей В.</span>
+                    <span class="text-[10px] text-emerald-400 font-mono">только что</span>
+                </div>
+                <p id="toast-user-action" class="text-slate-300">Записался на бесплатную консультацию в {{ org.name }}</p>
+                <div class="text-[10px] text-slate-500 flex items-center gap-1 pt-1">
+                    <i class="fa-solid fa-location-dot text-amber-400"></i>
+                    <span id="toast-user-city">{{ org.city or 'Москва' }}</span>
+                </div>
+            </div>
+            <button onclick="closeSocialToast()" class="text-slate-500 hover:text-white text-sm">✕</button>
+        </div>
+    </div>
+
+    <!-- Success Modal Notification for Lead Submissions -->
+    <div id="success-lead-modal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
+        <div class="bg-slate-900 border border-emerald-500/50 rounded-3xl max-w-md w-full p-8 text-center space-y-5 shadow-2xl relative">
+            <div class="w-16 h-16 mx-auto rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 flex items-center justify-center text-3xl shadow-inner">
+                <i class="fa-solid fa-circle-check"></i>
+            </div>
+            <h3 class="text-2xl font-extrabold text-white">Заявка успешно принята!</h3>
+            <p id="success-lead-msg" class="text-slate-300 text-sm leading-relaxed">
+                Спасибо! Наш менеджер из {{ org.name }} уже обрабатывает вашу заявку и свяжется с вами в течение 5 минут.
+            </p>
+            <button onclick="closeSuccessModal()" class="{{ template_cfg.primary_btn_class }} w-full py-3.5 rounded-2xl text-sm font-bold shadow-lg">
+                Понятно, спасибо!
+            </button>
+        </div>
+    </div>
+
+    <!-- Visual Template Selector Gallery Drawer Bar -->
     <div class="fixed bottom-0 left-0 right-0 z-50 bg-slate-950/95 border-t border-indigo-500/30 backdrop-blur-2xl px-4 py-3 shadow-2xl text-slate-100">
         <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-3">
             <div class="flex items-center gap-3">
@@ -85,17 +118,16 @@
             </div>
 
             <div class="hidden xl:flex items-center gap-2">
-                <a href="#offer-modal" onclick="openOfferModal()" class="{{ template_cfg.primary_btn_class }} px-4 py-2 rounded-xl text-xs uppercase tracking-wider font-extrabold shadow-lg">
+                <a href="#about" class="{{ template_cfg.primary_btn_class }} px-4 py-2 rounded-xl text-xs uppercase tracking-wider font-extrabold shadow-lg">
                     <i class="fa-solid fa-rocket mr-1"></i> Заказать сайт
                 </a>
             </div>
         </div>
     </div>
 
-    <!-- Beautiful Visual Template Selector Modal -->
+    <!-- Template Selector Modal -->
     <div id="template-gallery-modal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
-        <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-5xl w-full max-h-[90vh] flex flex-col overflow-hidden shadow-2xl relative animate-float">
-            <!-- Modal Header -->
+        <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-5xl w-full max-h-[90vh] flex flex-col overflow-hidden shadow-2xl relative">
             <div class="p-6 border-b border-slate-800 flex items-center justify-between bg-slate-950/80">
                 <div>
                     <div class="inline-flex items-center gap-2 text-xs font-mono uppercase text-indigo-400 mb-1">
@@ -108,7 +140,6 @@
                 </button>
             </div>
 
-            <!-- Modal Content (Grid of 10 Visual Templates) -->
             <div class="p-6 overflow-y-auto grid md:grid-cols-2 lg:grid-cols-3 gap-6 bg-slate-950/50">
                 {% for t_id, t_item in all_templates.items() %}
                 <a href="/demo/{{ org.id }}?template={{ t_id }}" class="group relative bg-slate-900 border border-slate-800 hover:border-indigo-500/60 rounded-2xl p-5 shadow-xl transition-all duration-300 hover:-translate-y-1 flex flex-col justify-between">
@@ -146,11 +177,6 @@
                 </a>
                 {% endfor %}
             </div>
-
-            <!-- Modal Footer -->
-            <div class="p-4 border-t border-slate-800 bg-slate-950 text-center text-xs text-slate-400">
-                Все шаблоны полностью адаптированы под ПК, планшеты и смартфоны.
-            </div>
         </div>
     </div>
 
@@ -161,13 +187,13 @@
                 <span class="bg-white/20 px-2 py-0.5 rounded text-xs uppercase font-bold tracking-wider">Интерактивный Демо-Портфолио</span>
                 <span>Вы смотрите Шаблон №{{ template_cfg.id }} ({{ template_cfg.name }}) для <strong>{{ org.name }}</strong></span>
             </div>
-            <a href="#offer-modal" onclick="openOfferModal()" class="mx-auto md:mx-0 bg-white text-slate-900 px-3 py-1 rounded-full text-xs font-bold hover:bg-amber-300 transition-colors shadow">
+            <a href="#about" class="mx-auto md:mx-0 bg-white text-slate-900 px-3 py-1 rounded-full text-xs font-bold hover:bg-amber-300 transition-colors shadow">
                 Хочу такой сайт себе &rarr;
             </a>
         </div>
     </div>
 
-    <!-- Navigation Header -->
+    <!-- Header Navigation -->
     <header class="{{ template_cfg.header_class }} sticky top-[33px] z-30 transition-all">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
             <div class="flex items-center gap-3">
@@ -182,10 +208,9 @@
 
             <nav class="hidden md:flex items-center gap-8 text-sm font-medium opacity-90">
                 <a href="#blueprint-section" class="hover:{{ template_cfg.accent_text_class }} transition-colors">Интерактивная схема</a>
-                <a href="#about" class="hover:{{ template_cfg.accent_text_class }} transition-colors">О компании</a>
-                <a href="#features" class="hover:{{ template_cfg.accent_text_class }} transition-colors">Преимущества</a>
-                <a href="#services" class="hover:{{ template_cfg.accent_text_class }} transition-colors">Услуги & Цены</a>
-                <a href="#contacts" class="hover:{{ template_cfg.accent_text_class }} transition-colors">Контакты</a>
+                <a href="#calculator-section" class="hover:{{ template_cfg.accent_text_class }} transition-colors">Живой Калькулятор</a>
+                <a href="#services" class="hover:{{ template_cfg.accent_text_class }} transition-colors">Услуги & Прайс</a>
+                <a href="#about" class="hover:{{ template_cfg.accent_text_class }} transition-colors">Оставить заявку</a>
             </nav>
 
             <div class="flex items-center gap-4">
@@ -195,7 +220,7 @@
                     <span>{{ org.phone }}</span>
                 </a>
                 {% endif %}
-                <a href="#contacts" class="{{ template_cfg.primary_btn_class }} px-5 py-2.5 {{ template_cfg.border_radius }} transition-all">
+                <a href="#about" class="{{ template_cfg.primary_btn_class }} px-5 py-2.5 {{ template_cfg.border_radius }} transition-all">
                     Записаться
                 </a>
             </div>
@@ -234,7 +259,7 @@
                 </p>
 
                 <div class="flex flex-col sm:flex-row gap-4 justify-center {% if template_cfg.hero_layout != 'centered' %}lg:justify-start{% endif %} pt-4">
-                    <a href="#contacts" class="{{ template_cfg.primary_btn_class }} inline-flex items-center justify-center gap-2 px-8 py-4 {{ template_cfg.border_radius }} text-lg transition-all hover:scale-[1.02]">
+                    <a href="#about" class="{{ template_cfg.primary_btn_class }} inline-flex items-center justify-center gap-2 px-8 py-4 {{ template_cfg.border_radius }} text-lg transition-all hover:scale-[1.02]">
                         <span>Оставить заявку</span>
                         <i class="fa-solid fa-arrow-right"></i>
                     </a>
@@ -279,7 +304,7 @@
         </div>
     </section>
 
-    <!-- WOW INTERACTIVE BLUEPRINT SECTION -->
+    <!-- INTERACTIVE BLUEPRINT / HOTSPOT SECTION -->
     <section id="blueprint-section" class="py-24 relative overflow-hidden border-t border-b border-slate-800/80 bg-slate-950 text-slate-100 blueprint-grid">
         <div class="absolute inset-0 bg-gradient-to-b from-slate-950 via-transparent to-slate-950 pointer-events-none"></div>
         <div class="absolute w-full h-1 bg-gradient-to-r from-transparent via-cyan-400 to-transparent opacity-20 animate-scanline pointer-events-none"></div>
@@ -302,20 +327,17 @@
             <div class="grid lg:grid-cols-12 gap-8 items-center">
                 <div class="lg:col-span-8 relative bg-slate-900/90 border border-cyan-500/30 rounded-2xl p-6 shadow-2xl overflow-hidden min-h-[420px] flex items-center justify-center">
 
-                    <!-- SVG Wireframe Scheme Illustration -->
                     <svg class="w-full h-full max-h-[380px] opacity-40 stroke-cyan-400" viewBox="0 0 800 450" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <rect x="50" y="50" width="700" height="350" rx="10" stroke-width="2" stroke-dasharray="6 6"/>
                         <line x1="50" y1="225" x2="750" y2="225" stroke-width="1" stroke-dasharray="4 4"/>
                         <line x1="400" y1="50" x2="400" y2="400" stroke-width="1" stroke-dasharray="4 4"/>
                         <circle cx="400" cy="225" r="120" stroke-width="1.5"/>
-                        <!-- Dimension Lines -->
                         <line x1="50" y1="30" x2="750" y2="30" stroke-width="1.5"/>
                         <line x1="50" y1="20" x2="50" y2="40" stroke-width="1.5"/>
                         <line x1="750" y1="20" x2="750" y2="40" stroke-width="1.5"/>
                         <text x="380" y="24" fill="#38bdf8" font-size="12" font-family="monospace">СХЕМА: 14.8 м</text>
                     </svg>
 
-                    <!-- Dynamic Hotspots Overlay -->
                     {% for spot in config.hotspots %}
                     <button onclick="selectHotspot('{{ spot.id }}', '{{ spot.title }}', '{{ spot.details }}', '{{ spot.price }}')"
                             style="left: {{ spot.x }}; top: {{ spot.y }};"
@@ -345,10 +367,9 @@
                         </div>
 
                         <div class="pt-4 border-t border-slate-800 flex flex-col gap-3">
-                            <a href="#contacts" class="{{ template_cfg.primary_btn_class }} w-full py-3 rounded-xl text-center font-bold text-sm">
+                            <a href="#about" class="{{ template_cfg.primary_btn_class }} w-full py-3 rounded-xl text-center font-bold text-sm">
                                 Заказать консультацию
                             </a>
-                            <span class="text-xs text-center text-slate-500">Точный расчет стоимости производится бесплатно</span>
                         </div>
                     </div>
                 </div>
@@ -358,13 +379,11 @@
             <!-- BEAUTY BEFORE / AFTER SLIDER -->
             <div class="max-w-4xl mx-auto bg-slate-900/90 border border-rose-500/30 rounded-3xl p-6 shadow-2xl">
                 <div class="relative w-full h-[400px] rounded-2xl overflow-hidden select-none" id="before-after-container">
-                    <!-- After Image (Base) -->
                     <img src="{{ config.before_after.after_img }}" alt="After" class="absolute inset-0 w-full h-full object-cover">
                     <div class="absolute top-4 right-4 bg-rose-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow">
                         {{ config.before_after.after_label }}
                     </div>
 
-                    <!-- Before Image (Clipped) -->
                     <div id="before-image-wrap" class="absolute inset-y-0 left-0 w-1/2 overflow-hidden border-r-2 border-white shadow-2xl">
                         <img src="{{ config.before_after.before_img }}" alt="Before" class="absolute inset-0 w-full h-full object-cover max-w-none" style="width: 100%; min-width: 800px;">
                         <div class="absolute top-4 left-4 bg-slate-900/90 text-white text-xs font-bold px-3 py-1 rounded-full shadow border border-slate-700">
@@ -372,7 +391,6 @@
                         </div>
                     </div>
 
-                    <!-- Slider Range Control -->
                     <input type="range" min="0" max="100" value="50" class="absolute inset-0 w-full h-full opacity-0 cursor-ew-resize z-20" oninput="updateBeforeAfter(this.value)">
                 </div>
                 <div class="text-center mt-4 text-xs font-mono text-slate-400">
@@ -393,8 +411,8 @@
                     </div>
                     <h3 class="text-xl font-bold mb-2 group-hover:text-emerald-400 transition-colors">{{ item.name }}</h3>
                     <p class="text-slate-400 text-xs leading-relaxed mb-6">{{ item.desc }}</p>
-                    <a href="#contacts" class="w-full bg-slate-800 hover:bg-emerald-600 hover:text-slate-950 text-white text-xs font-bold py-2.5 rounded-xl transition-all block text-center">
-                        Быстрый просмотр
+                    <a href="#about" class="w-full bg-slate-800 hover:bg-emerald-600 hover:text-slate-950 text-white text-xs font-bold py-2.5 rounded-xl transition-all block text-center">
+                        Быстрый заказ
                     </a>
                 </div>
                 {% endfor %}
@@ -422,7 +440,7 @@
                             {% endfor %}
                         </ul>
                     </div>
-                    <a href="#contacts" class="{{ template_cfg.primary_btn_class }} py-3 rounded-xl text-center text-xs font-bold">
+                    <a href="#about" class="{{ template_cfg.primary_btn_class }} py-3 rounded-xl text-center text-xs font-bold">
                         Записаться на чекап
                     </a>
                 </div>
@@ -430,12 +448,12 @@
             </div>
 
             {% else %}
-            <!-- GENERAL ROI & COST CALCULATOR -->
+            <!-- DEFAULT BLUEPRINT -->
             <div class="max-w-2xl mx-auto bg-slate-900/90 border border-indigo-500/30 rounded-3xl p-8 shadow-2xl space-y-6">
                 <div class="space-y-4">
                     <div class="flex justify-between text-sm font-bold">
                         <span>Масштаб проекта / задачи:</span>
-                        <span id="calc-scale-label" class="text-indigo-400">Средний бизнес (10-50 сотр.)</span>
+                        <span id="calc-scale-label" class="text-indigo-400">Средний бизнес</span>
                     </div>
                     <input type="range" min="1" max="3" value="2" class="w-full accent-indigo-500 cursor-pointer" oninput="updateCalculator(this.value)">
                 </div>
@@ -451,7 +469,7 @@
                     </div>
                 </div>
 
-                <a href="#contacts" class="{{ template_cfg.primary_btn_class }} w-full py-3.5 rounded-2xl text-center font-bold block text-sm">
+                <a href="#about" class="{{ template_cfg.primary_btn_class }} w-full py-3.5 rounded-2xl text-center font-bold block text-sm">
                     Получить детальный сметный расчет
                 </a>
             </div>
@@ -460,46 +478,107 @@
         </div>
     </section>
 
-    <!-- Features Section -->
-    <section id="features" class="py-24 relative border-t border-slate-800/50">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center max-w-3xl mx-auto mb-16 space-y-4">
-                <h2 class="text-xs font-bold uppercase tracking-widest {{ template_cfg.accent_text_class }}">Почему выбирают нас</h2>
-                <p class="text-3xl sm:text-4xl font-extrabold">Ключевые преимущества {{ org.name }}</p>
+    <!-- LIVE INTERACTIVE SERVICE CALCULATOR WITH DYNAMIC OPTIONS -->
+    <section id="calculator-section" class="py-24 border-t border-slate-800/80 bg-slate-950/40">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12 space-y-3">
+                <div class="inline-flex items-center gap-2 px-3 py-1 bg-amber-500/10 text-amber-400 border border-amber-500/30 rounded-full text-xs font-mono uppercase">
+                    <i class="fa-solid fa-calculator"></i> Динамический Калькулятор
+                </div>
+                <h2 class="text-3xl sm:text-4xl font-extrabold text-white">Рассчитайте стоимость с учетом опций</h2>
+                <p class="text-slate-400 text-sm">Отмечайте нужные опции — итоговая стоимость пересчитывается моментально</p>
             </div>
 
-            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-                {% for feat in config.features %}
-                <div class="{{ template_cfg.card_class }} p-8 transition-all group">
-                    <div class="w-14 h-14 {{ template_cfg.border_radius }} {{ template_cfg.badge_class }} flex items-center justify-center text-2xl mb-6 group-hover:scale-110 transition-all">
-                        <i class="fa-solid {{ feat.icon }}"></i>
+            <div class="{{ template_cfg.card_class }} p-8 sm:p-10 shadow-2xl space-y-8 border border-slate-800">
+                <!-- Base Service Select -->
+                <div class="space-y-3">
+                    <label class="block text-xs font-mono uppercase text-amber-400 font-bold">1. Выберите основную услугу:</label>
+                    <div class="grid sm:grid-cols-2 gap-4">
+                        <label onclick="recalcServiceCost()" class="flex items-center gap-3 p-4 bg-slate-900/80 border border-slate-800 rounded-2xl cursor-pointer hover:border-amber-500 transition-all">
+                            <input type="radio" name="base_service" value="3500" checked class="accent-amber-500 w-4 h-4">
+                            <div>
+                                <div class="font-bold text-sm text-white">Базовый комплекс</div>
+                                <div class="text-xs opacity-60">от 3 500 ₽</div>
+                            </div>
+                        </label>
+                        <label onclick="recalcServiceCost()" class="flex items-center gap-3 p-4 bg-slate-900/80 border border-slate-800 rounded-2xl cursor-pointer hover:border-amber-500 transition-all">
+                            <input type="radio" name="base_service" value="8500" class="accent-amber-500 w-4 h-4">
+                            <div>
+                                <div class="font-bold text-sm text-white">Премиум обслуживание</div>
+                                <div class="text-xs opacity-60">от 8 500 ₽</div>
+                            </div>
+                        </label>
                     </div>
-                    <h3 class="text-xl font-bold mb-3">{{ feat.title }}</h3>
-                    <p class="opacity-75 text-sm leading-relaxed">{{ feat.desc }}</p>
                 </div>
-                {% endfor %}
+
+                <!-- Addon Checkboxes -->
+                <div class="space-y-3">
+                    <label class="block text-xs font-mono uppercase text-amber-400 font-bold">2. Дополнительные опции и гарантии:</label>
+                    <div class="grid sm:grid-cols-2 gap-3">
+                        <label class="flex items-center gap-3 p-3.5 bg-slate-900/60 border border-slate-800/80 rounded-xl cursor-pointer hover:border-slate-700">
+                            <input type="checkbox" value="1500" onchange="recalcServiceCost()" class="addon-cb accent-amber-500 w-4 h-4">
+                            <span class="text-xs text-slate-200">Расширенная гарантия (+ 1 500 ₽)</span>
+                        </label>
+                        <label class="flex items-center gap-3 p-3.5 bg-slate-900/60 border border-slate-800/80 rounded-xl cursor-pointer hover:border-slate-700">
+                            <input type="checkbox" value="2000" onchange="recalcServiceCost()" class="addon-cb accent-amber-500 w-4 h-4">
+                            <span class="text-xs text-slate-200">Экспресс-выполнение за 1 день (+ 2 000 ₽)</span>
+                        </label>
+                        <label class="flex items-center gap-3 p-3.5 bg-slate-900/60 border border-slate-800/80 rounded-xl cursor-pointer hover:border-slate-700">
+                            <input type="checkbox" value="1000" onchange="recalcServiceCost()" class="addon-cb accent-amber-500 w-4 h-4">
+                            <span class="text-xs text-slate-200">Выезд специалиста на объект (+ 1 000 ₽)</span>
+                        </label>
+                        <label class="flex items-center gap-3 p-3.5 bg-slate-900/60 border border-slate-800/80 rounded-xl cursor-pointer hover:border-slate-700">
+                            <input type="checkbox" value="2500" onchange="recalcServiceCost()" class="addon-cb accent-amber-500 w-4 h-4">
+                            <span class="text-xs text-slate-200">Сервисный VIP-набор (+ 2 500 ₽)</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Result Box -->
+                <div class="p-6 bg-slate-950 rounded-2xl border border-amber-500/30 flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <div>
+                        <span class="text-xs text-slate-400 block mb-1">Итоговая ориентировочная стоимость:</span>
+                        <span id="calc-live-total" class="text-3xl font-black text-amber-400">3 500 ₽</span>
+                    </div>
+                    <button onclick="submitCalculatorLead()" class="{{ template_cfg.primary_btn_class }} px-6 py-3.5 rounded-xl font-bold text-xs uppercase tracking-wider shadow-lg">
+                        Зафиксировать скидку
+                    </button>
+                </div>
             </div>
         </div>
     </section>
 
-    <!-- Services & Pricing Section -->
+    <!-- Services & Pricing Section with Live Category Tab Filtering -->
     <section id="services" class="py-24">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center max-w-3xl mx-auto mb-16 space-y-4">
-                <h2 class="text-xs font-bold uppercase tracking-widest {{ template_cfg.accent_text_class }}">Прайс-лист</h2>
-                <p class="text-3xl sm:text-4xl font-extrabold">Популярные услуги и цены</p>
+            <div class="text-center max-w-3xl mx-auto mb-12 space-y-4">
+                <h2 class="text-xs font-bold uppercase tracking-widest {{ template_cfg.accent_text_class }}">Прайс-лист & Тарифы</h2>
+                <p class="text-3xl sm:text-4xl font-extrabold">Популярные услуги компании</p>
+
+                <!-- Live Tab Buttons -->
+                <div class="flex flex-wrap justify-center gap-2 pt-4">
+                    <button onclick="filterServices('all', this)" class="service-tab-btn active px-4 py-2 rounded-xl text-xs font-bold bg-amber-500 text-slate-950 shadow">
+                        Все услуги
+                    </button>
+                    <button onclick="filterServices('popular', this)" class="service-tab-btn px-4 py-2 rounded-xl text-xs font-bold bg-slate-800 text-slate-300 hover:bg-slate-700">
+                        🔥 Популярное
+                    </button>
+                    <button onclick="filterServices('express', this)" class="service-tab-btn px-4 py-2 rounded-xl text-xs font-bold bg-slate-800 text-slate-300 hover:bg-slate-700">
+                        ⚡ Экспресс
+                    </button>
+                </div>
             </div>
 
             <div class="grid md:grid-cols-2 gap-6 max-w-5xl mx-auto">
                 {% for service in config.services %}
-                <div class="{{ template_cfg.card_class }} p-6 flex items-center justify-between">
+                <div class="service-card-item {{ template_cfg.card_class }} p-6 flex items-center justify-between transition-all duration-300" data-tag="{% if loop.index % 2 == 0 %}express{% else %}popular{% endif %}">
                     <div class="flex items-center gap-4">
                         <div class="w-10 h-10 rounded-full {{ template_cfg.badge_class }} flex items-center justify-center font-bold">
                             <i class="fa-solid fa-check"></i>
                         </div>
                         <div>
                             <h4 class="font-semibold text-lg">{{ service.name }}</h4>
-                            <span class="text-xs opacity-60">Гарантия и высокое качество</span>
+                            <span class="text-xs opacity-60">Гарантия и высшее качество</span>
                         </div>
                     </div>
                     <div class="{{ template_cfg.accent_text_class }} font-bold text-lg {{ template_cfg.badge_class }} px-4 py-2 {{ template_cfg.border_radius }}">
@@ -511,7 +590,7 @@
         </div>
     </section>
 
-    <!-- Advantages Section -->
+    <!-- AJAX Lead Form Section -->
     <section id="about" class="py-24 border-t border-slate-800/50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid lg:grid-cols-2 gap-12 items-center">
             <div class="space-y-6">
@@ -535,20 +614,21 @@
                 <h3 class="text-2xl font-bold mb-2">Оставить заявку на консультацию</h3>
                 <p class="opacity-70 text-sm mb-6">Заполните форму и наш менеджер свяжется с вами в течение 5 минут.</p>
 
-                <form onsubmit="handleFormSubmit(event)" class="space-y-4">
+                <form onsubmit="handleLeadSubmit(event)" class="space-y-4">
+                    <input type="hidden" name="organization_id" value="{{ org.id }}">
                     <div>
                         <label class="block text-xs font-semibold opacity-80 mb-1">Ваше имя</label>
-                        <input type="text" required placeholder="Иван" class="w-full bg-slate-900/80 border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-amber-500">
+                        <input type="text" name="client_name" required placeholder="Иван" class="w-full bg-slate-900/80 border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-amber-500">
                     </div>
                     <div>
                         <label class="block text-xs font-semibold opacity-80 mb-1">Номер телефона</label>
-                        <input type="tel" required placeholder="+7 (999) 000-00-00" class="w-full bg-slate-900/80 border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-amber-500">
+                        <input type="tel" name="phone" required placeholder="+7 (999) 000-00-00" class="w-full bg-slate-900/80 border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-amber-500">
                     </div>
                     <div>
                         <label class="block text-xs font-semibold opacity-80 mb-1">Комментарий (необязательно)</label>
-                        <textarea rows="3" placeholder="Опишите ваш вопрос..." class="w-full bg-slate-900/80 border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-amber-500"></textarea>
+                        <textarea name="comment" rows="3" placeholder="Опишите ваш вопрос..." class="w-full bg-slate-900/80 border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-amber-500"></textarea>
                     </div>
-                    <button type="submit" class="w-full {{ template_cfg.primary_btn_class }} py-4 {{ template_cfg.border_radius }} transition-colors shadow-lg">
+                    <button type="submit" class="w-full {{ template_cfg.primary_btn_class }} py-4 {{ template_cfg.border_radius }} transition-colors shadow-lg font-bold">
                         Записаться прямо сейчас
                     </button>
                 </form>
@@ -556,7 +636,7 @@
         </div>
     </section>
 
-    <!-- Client Reviews / Social Proof Section -->
+    <!-- Client Reviews Section -->
     <section class="py-20 border-t border-slate-800/80 bg-slate-950/60">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center max-w-3xl mx-auto mb-16 space-y-3">
@@ -595,37 +675,6 @@
                         </div>
                     </div>
                 </div>
-                {% endfor %}
-            </div>
-        </div>
-    </section>
-
-    <!-- FAQ Accordion Section -->
-    <section class="py-20 border-t border-slate-800/80">
-        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center mb-12 space-y-3">
-                <h2 class="text-3xl sm:text-4xl font-extrabold text-white">Часто задаваемые вопросы</h2>
-                <p class="text-slate-400 text-sm">Ответы на самые популярные вопросы наших клиентов</p>
-            </div>
-
-            <div class="space-y-4">
-                {% set default_faqs = [
-                    {"q": "Как быстро вы связываетесь после отправки заявки?", "a": "Наш менеджер перезванивает в течение 3-5 минут в рабочее время с 09:00 до 21:00."},
-                    {"q": "Предоставляются ли скидки при онлайн-записи?", "a": "Да, при первой записи через наш сайт вы автоматически получаете гарантированную скидку или бонус."},
-                    {"q": "Какие варианты оплаты вы принимаете?", "a": "Мы принимаем банковские карты, наличные, переводы СБП и работу по безналичному расчету с юр. лицами."}
-                ] %}
-                {% for faq in config.faqs or default_faqs %}
-                <details class="{{ template_cfg.card_class }} p-6 rounded-2xl group cursor-pointer transition-all">
-                    <summary class="font-bold text-base text-white flex justify-between items-center list-none">
-                        <span>{{ faq.q }}</span>
-                        <span class="w-8 h-8 rounded-full bg-slate-800 group-open:rotate-180 transition-transform flex items-center justify-center text-xs text-amber-400">
-                            ▼
-                        </span>
-                    </summary>
-                    <p class="mt-4 text-sm opacity-80 leading-relaxed pt-3 border-t border-slate-800/60">
-                        {{ faq.a }}
-                    </p>
-                </details>
                 {% endfor %}
             </div>
         </div>
@@ -673,12 +722,50 @@
     <script>
         function toggleTemplateGallery() {
             const modal = document.getElementById('template-gallery-modal');
-            if (modal) {
-                modal.classList.toggle('hidden');
-            }
+            if (modal) modal.classList.toggle('hidden');
         }
 
-        // Countdown timer for urgency bar
+        function closeSuccessModal() {
+            const modal = document.getElementById('success-lead-modal');
+            if (modal) modal.classList.add('hidden');
+        }
+
+        // Live Social Proof Popups Feed
+        const fakeUsers = [
+            { name: "Алексей В.", city: "{{ org.city or 'Москва' }}", action: "Записался на бесплатную консультацию" },
+            { name: "Елена М.", city: "{{ org.city or 'Санкт-Петербург' }}", action: "Забронировала скидку 15% на первый визит" },
+            { name: "Дмитрий К.", city: "{{ org.city or 'Казань' }}", action: "Запросил коммерческий расчет стоимости" },
+            { name: "Ольга С.", city: "{{ org.city or 'Новосибирск' }}", action: "Записалась на прием к специалисту" }
+        ];
+        let toastIndex = 0;
+
+        function showSocialToast() {
+            const toast = document.getElementById('live-social-toast');
+            if (!toast) return;
+
+            const u = fakeUsers[toastIndex % fakeUsers.length];
+            toastIndex++;
+
+            document.getElementById('toast-user-name').textContent = u.name;
+            document.getElementById('toast-user-action').textContent = u.action;
+            document.getElementById('toast-user-city').textContent = u.city;
+
+            toast.classList.remove('hidden');
+            setTimeout(() => {
+                toast.classList.add('hidden');
+            }, 6000);
+        }
+
+        function closeSocialToast() {
+            const toast = document.getElementById('live-social-toast');
+            if (toast) toast.classList.add('hidden');
+        }
+
+        // Trigger toast every 14 seconds
+        setInterval(showSocialToast, 14000);
+        setTimeout(showSocialToast, 3000);
+
+        // Countdown timer
         let timerSeconds = 17990;
         setInterval(() => {
             if (timerSeconds > 0) timerSeconds--;
@@ -689,20 +776,86 @@
             if (timerEl) timerEl.textContent = `${hrs}:${mins}:${secs}`;
         }, 1000);
 
-        function handleFormSubmit(e) {
+        // AJAX Lead Submit Function
+        async function handleLeadSubmit(e) {
             e.preventDefault();
-            alert('Спасибо за заявку! В ближайшее время с вами свяжется менеджер {{ org.name }}.');
+            const form = e.target;
+            const formData = new FormData(form);
+
+            try {
+                const response = await fetch('/api/leads', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await response.json();
+
+                if (response.ok) {
+                    form.reset();
+                    const msgEl = document.getElementById('success-lead-msg');
+                    if (msgEl) msgEl.textContent = data.message || 'Спасибо! Заявка успешно принята.';
+                    document.getElementById('success-lead-modal').classList.remove('hidden');
+                } else {
+                    alert('Ошибка при отправке: ' + (data.detail || 'Попробуйте позже.'));
+                }
+            } catch (err) {
+                alert('Произошла ошибка при отправке заявки.');
+            }
         }
 
-        function openOfferModal() {
-            alert('Вам понравился Шаблон #{{ template_cfg.id }} ("{{ template_cfg.name }}") для {{ org.name }}?\nМы с радостью запустим для вас точно такой же лендинг с вашими логотипами, описаниями и услугами!');
+        // Dynamic Calculator recalculation
+        function recalcServiceCost() {
+            const selectedBase = document.querySelector('input[name="base_service"]:checked');
+            let total = selectedBase ? parseInt(selectedBase.value) : 3500;
+
+            const addons = document.querySelectorAll('.addon-cb:checked');
+            addons.forEach(cb => {
+                total += parseInt(cb.value);
+            });
+
+            const totalEl = document.getElementById('calc-live-total');
+            if (totalEl) {
+                totalEl.textContent = total.toLocaleString('ru-RU') + ' ₽';
+            }
+        }
+
+        async function submitCalculatorLead() {
+            const totalText = document.getElementById('calc-live-total').textContent;
+            const formData = new FormData();
+            formData.append('organization_id', '{{ org.id }}');
+            formData.append('client_name', 'Клиент Калькулятора');
+            formData.append('phone', '+7 (999) 000-00-00');
+            formData.append('comment', 'Расчет стоимости в калькуляторе: ' + totalText);
+
+            try {
+                const res = await fetch('/api/leads', { method: 'POST', body: formData });
+                if (res.ok) {
+                    document.getElementById('success-lead-modal').classList.remove('hidden');
+                }
+            } catch(e) {}
+        }
+
+        // Live Service Tab Filter
+        function filterServices(tag, btn) {
+            document.querySelectorAll('.service-tab-btn').forEach(b => {
+                b.classList.remove('bg-amber-500', 'text-slate-950', 'active');
+                b.classList.add('bg-slate-800', 'text-slate-300');
+            });
+            btn.classList.add('bg-amber-500', 'text-slate-950', 'active');
+            btn.classList.remove('bg-slate-800', 'text-slate-300');
+
+            document.querySelectorAll('.service-card-item').forEach(card => {
+                if (tag === 'all' || card.getAttribute('data-tag') === tag) {
+                    card.style.display = 'flex';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
         }
 
         function selectHotspot(id, title, details, price) {
             const titleEl = document.getElementById('hotspot-title');
             const detailsEl = document.getElementById('hotspot-details');
             const priceEl = document.getElementById('hotspot-price');
-
             if (titleEl) titleEl.textContent = title;
             if (detailsEl) detailsEl.textContent = details;
             if (priceEl) priceEl.textContent = price;
@@ -710,9 +863,7 @@
 
         function updateBeforeAfter(val) {
             const wrap = document.getElementById('before-image-wrap');
-            if (wrap) {
-                wrap.style.width = val + '%';
-            }
+            if (wrap) wrap.style.width = val + '%';
         }
 
         function updateCalculator(val) {
@@ -725,11 +876,11 @@
                 if (days) days.textContent = '3 - 5 дней';
                 if (price) price.textContent = 'от 7 500 ₽';
             } else if (val == 2) {
-                if (label) label.textContent = 'Средний бизнес (10-50 сотр.)';
+                if (label) label.textContent = 'Средний бизнес';
                 if (days) days.textContent = '7 - 14 дней';
                 if (price) price.textContent = 'от 15 000 ₽';
             } else {
-                if (label) label.textContent = 'Крупное предприятие / Сеть';
+                if (label) label.textContent = 'Крупное предприятие';
                 if (days) days.textContent = '14 - 30 дней';
                 if (price) price.textContent = 'от 45 000 ₽';
             }

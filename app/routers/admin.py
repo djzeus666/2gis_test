@@ -3,7 +3,7 @@ from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
 from app.database import get_db
-from app.models import Organization
+from app.models import Organization, Lead
 from app.importers import parse_csv_data, parse_json_data, import_organizations_to_db
 
 router = APIRouter()
@@ -12,12 +12,14 @@ templates = Jinja2Templates(directory="app/templates")
 @router.get("/", response_class=HTMLResponse)
 def dashboard(request: Request, db: Session = Depends(get_db)):
     organizations = db.query(Organization).order_by(Organization.created_at.desc()).all()
+    leads = db.query(Lead).order_by(Lead.created_at.desc()).all()
     host_url = str(request.base_url).rstrip('/')
     return templates.TemplateResponse(
         request=request,
         name="dashboard.html",
         context={
             "organizations": organizations,
+            "leads": leads,
             "host_url": host_url
         }
     )
